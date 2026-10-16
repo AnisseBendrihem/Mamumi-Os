@@ -1,5 +1,5 @@
-/* Icones Nerd Font chargees depuis le web (rien a installer). */
-@import 'https://www.nerdfonts.com/assets/css/webfont.css';
+/* Icones Nerd Font embarquees (seulement celles utilisees). */
+@import './vendor/nerdfont/nerd-icons.css';
 
 /* Palette Tokyo Night */
 :root {

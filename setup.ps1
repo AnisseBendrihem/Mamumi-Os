@@ -16,8 +16,6 @@ $Tools = Join-Path $env:ProgramData 'Mamumi-Os'          # chemin sans espace (r
 $Glzr = Join-Path $env:USERPROFILE '.glzr'
 $GlazeExe = Join-Path $env:ProgramFiles 'glzr.io\GlazeWM\glazewm.exe'
 $ZebarExe = Join-Path $env:ProgramFiles 'glzr.io\Zebar\zebar.exe'
-$FlowExe = Join-Path $env:LOCALAPPDATA 'FlowLauncher\Flow.Launcher.exe'
-$FlowData = Join-Path $env:APPDATA 'FlowLauncher'
 
 function Step($m) { Write-Host "`n== $m" -ForegroundColor Cyan }
 function Ok($m) { Write-Host "   [OK] $m" -ForegroundColor Green }
@@ -37,7 +35,7 @@ function Get-BackupDir {
     if ($d) { 'D:\Sauvegarde_Mamumi-Os' } else { Join-Path $env:USERPROFILE 'Sauvegarde_Mamumi-Os' }
 }
 function Save-Json($obj, $path) {
-    # UTF-8 sans BOM (Windows Terminal et Flow le preferent).
+    # UTF-8 sans BOM (Windows Terminal le prefere).
     [IO.File]::WriteAllText($path, ($obj | ConvertTo-Json -Depth 32), (New-Object Text.UTF8Encoding $false))
 }
 function New-Shortcut($path, $target, $arguments = '', $icon = '') {
@@ -58,8 +56,9 @@ Write-Host @'
 if (-not $Repair -and -not $Yes) {
     Write-Host @"
  Ce script va :
-   - installer GlazeWM (+ sa barre Zebar) et Flow Launcher (via winget)
-   - appliquer le theme Tokyo Night (Windows, menu Demarrer, terminal, lanceur)
+   - installer GlazeWM (+ sa barre Zebar) via winget : le seul logiciel ajoute
+   - appliquer le theme Tokyo Night (Windows, menu Demarrer, terminal)
+   - ranger les fenetres en spirale facon Hyprland, panneau des raccourcis (Win + K)
    - cacher la barre des taches Windows et la remplacer par une barre en haut
    - configurer les raccourcis clavier facon Omarchy (touche Windows)
    - supprimer les pubs, suggestions, Copilot, Recall, Widgets, la telemetrie
@@ -101,21 +100,21 @@ if (-not $Repair) {
         Warn "winget introuvable. Installe 'App Installer' depuis le Microsoft Store puis relance."
         return
     }
-    foreach ($id in 'glzr-io.glazewm', 'Flow-Launcher.Flow-Launcher') {
-        Write-Host "   Installation de $id..."
-        winget install --id $id --exact --silent --accept-package-agreements --accept-source-agreements | Out-Null
-    }
+    Write-Host "   Installation de GlazeWM (inclut la barre Zebar)..."
+    winget install --id glzr-io.glazewm --exact --silent --accept-package-agreements --accept-source-agreements | Out-Null
     if (Test-Path $GlazeExe) { Ok 'GlazeWM installe' } else { Warn 'GlazeWM introuvable apres installation' }
     if (Test-Path $ZebarExe) { Ok 'Zebar installe' } else { Warn 'Zebar introuvable apres installation' }
-    if (Test-Path $FlowExe) { Ok 'Flow Launcher installe' } else { Warn 'Flow Launcher introuvable apres installation' }
 }
 
 # ------------------------------------------------------------
-Step "4. Outils Mamumi-Os (panneaux Windows, barre cachee, raccourcis)"
-Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -match 'hide-taskbar\.ps1' } |
-    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
-Copy-Item "$repoCopy\tools\hide-taskbar.ps1" "$Tools\hide-taskbar.ps1" -Force
+Step "4. Outils Mamumi-Os (barre cachee, spirale, panneaux Windows, raccourcis)"
 $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+# Garde : cache la barre Windows, relance la barre si elle plante, spirale facon Hyprland.
+Get-Process taskbar-guard -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+if (-not (Test-Path "$Tools\taskbar-guard.exe") -or -not $Repair) {
+    & $csc /nologo /target:winexe /optimize+ /out:"$Tools\taskbar-guard.exe" "$repoCopy\tools\taskbar-guard.cs" | Out-Null
+}
+if (Test-Path "$Tools\taskbar-guard.exe") { Ok 'taskbar-guard.exe compile (barre cachee + spirale)' } else { Warn 'Compilation de taskbar-guard.exe echouee' }
 if (-not (Test-Path "$Tools\flyout.exe") -or -not $Repair) {
     & $csc /nologo /target:winexe /optimize+ /out:"$Tools\flyout.exe" "$repoCopy\tools\flyout.cs" | Out-Null
 }
@@ -142,8 +141,7 @@ if ($progId) {
 }
 if (-not $browser -or -not (Test-Path $browser)) { $browser = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe" }
 New-Shortcut "$Tools\Browser.lnk" $browser
-New-Shortcut "$Tools\Flow.lnk" $FlowExe
-Ok "Raccourcis : navigateur = $(Split-Path $browser -Leaf), lanceur = Flow"
+Ok "Win + B ouvrira : $(Split-Path $browser -Leaf)"
 
 # ------------------------------------------------------------
 Step "5. Configuration GlazeWM + barre du haut"
@@ -170,28 +168,13 @@ foreach ($c in $cfg) {
 Ok 'Config GlazeWM et barre en place'
 
 # ------------------------------------------------------------
-Step "6. Flow Launcher (theme Tokyo Night, Win + Espace)"
-if (Test-Path $FlowExe) {
-    New-Item -ItemType Directory -Force "$FlowData\Themes" | Out-Null
-    Copy-Item "$repoCopy\config\flow\Tokyo Night.xaml" "$FlowData\Themes\Tokyo Night.xaml" -Force
-    $flowSettings = "$FlowData\Settings\Settings.json"
-    if (-not (Test-Path $flowSettings)) {
-        Start-Process $FlowExe
-        for ($i = 0; $i -lt 40 -and -not (Test-Path $flowSettings); $i++) { Start-Sleep -Milliseconds 500 }
-        Start-Sleep 2
-    }
-    Get-Process Flow.Launcher -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep 2
-    if (Test-Path $flowSettings) {
-        try {
-            $j = Get-Content $flowSettings -Raw | ConvertFrom-Json
-            foreach ($p in @{ Theme = 'Tokyo Night'; MaxResultsToShow = 6; WindowSize = 640; SearchWindowScreen = 'Cursor'; SearchWindowAlign = 'Center'; HideWhenDeactivated = $true; AutoUpdates = $false; AutoUpdatePlugins = $false }.GetEnumerator()) {
-                if ($j.PSObject.Properties.Name -contains $p.Key) { $j.($p.Key) = $p.Value } else { $j | Add-Member -NotePropertyName $p.Key -NotePropertyValue $p.Value }
-            }
-            Save-Json $j $flowSettings
-            Ok 'Flow configure (theme Tokyo Night)'
-        } catch { Warn "Reglages Flow : $_" }
-    } else { Warn "Reglages Flow introuvables (lance Flow une fois puis relance le script)" }
-} else { Warn 'Flow Launcher absent' }
+Step "6. Bibliotheques de la barre (embarquees : aucune dependance Internet)"
+$vendorDst = Join-Path $Glzr 'zebar\tokyo-night\vendor'
+if (-not $Repair -or -not (Test-Path "$vendorDst\zebar@3.3.1\es2022\zebar.bundle.js")) {
+    if (Test-Path $vendorDst) { Remove-Item $vendorDst -Recurse -Force }
+    Copy-Item (Join-Path $repoCopy 'config\zebar\tokyo-night\vendor') $vendorDst -Recurse -Force
+}
+if (Test-Path "$vendorDst\zebar@3.3.1\es2022\zebar.bundle.js") { Ok 'Bibliotheques et icones de la barre en place' } else { Warn 'Bibliotheques de la barre manquantes' }
 
 # ------------------------------------------------------------
 Step "7. Windows Terminal (theme Tokyo Night)"
@@ -318,7 +301,7 @@ Ok "Sauvegarde dans $(Get-BackupDir)"
 
 # ------------------------------------------------------------
 Step "15. Demarrage de GlazeWM et de la barre"
-Get-Process glazewm, zebar -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process taskbar-guard, glazewm, zebar -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
 Start-Sleep 3
 if (-not (Get-Process explorer -ErrorAction SilentlyContinue)) { Start-Process explorer }
@@ -334,7 +317,7 @@ Write-Host @"
   Termine ! Redemarre le PC pour tout finaliser.
 
   Win + K          TOUS les raccourcis (navigable, Entree = executer)
-  Win + Entree     terminal         Win + Espace   lanceur
+  Win + Entree     terminal         Win + Espace   menu Demarrer
   Win + B          navigateur       Win + W        fermer
   Win + fleches    changer de fenetre
   Win + 1..9       espaces de travail

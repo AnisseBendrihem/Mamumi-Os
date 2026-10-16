@@ -58,6 +58,9 @@ static class Flyout
             case "volume":
                 Press(LWIN, CTRL, 0x56);   // Win + Ctrl + V
                 return;
+            case "start":
+                Press(LWIN);               // menu Demarrer (Win + Espace)
+                return;
             case "calendar":
                 // Le clic sur la barre lui fait perdre le focus : s'il est encore
                 // affiche, c'est qu'il etait ouvert -> on le laisse se fermer.

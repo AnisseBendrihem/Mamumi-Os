@@ -6,15 +6,14 @@
 # ==========================================================
 
 general:
-  # Lance la barre du haut, cache la barre Windows, lance le lanceur Flow.
+  # Lance la barre du haut et la garde (barre Windows cachee + relance auto + spirale).
   startup_commands:
     - 'shell-exec zebar'
-    - 'shell-exec conhost.exe --headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\ProgramData\Mamumi-Os\hide-taskbar.ps1'
-    - 'shell-exec explorer.exe C:\ProgramData\Mamumi-Os\Flow.lnk'
+    - 'shell-exec C:\ProgramData\Mamumi-Os\taskbar-guard.exe'
   # A la fermeture de GlazeWM : la barre Windows reapparait.
   shutdown_commands:
     - 'shell-exec taskkill /IM zebar.exe /F'
-    - 'shell-exec conhost.exe --headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\ProgramData\Mamumi-Os\hide-taskbar.ps1 -Show'
+    - 'shell-exec C:\ProgramData\Mamumi-Os\taskbar-guard.exe show'
   config_reload_commands: []
   focus_follows_cursor: false
   toggle_workspace_on_refocus: false
@@ -89,10 +88,10 @@ window_rules:
     match:
       - window_process: { regex: '(?i)^(VALORANT.*|League of Legends|LeagueClient.*|Riot.*|FortniteClient.*|FortniteLauncher|cs2|csgo|dota2|r5apex.*|RainbowSix.*|RocketLeague|GTA5|PlayGTAV|RDR2|eldenring|DarkSoulsIII|sekiro|bg3.*|Cyberpunk2077|witcher3|DOOMEternal.*|StreetFighter6|Overwatch|Minecraft.*|javaw|FC2[0-9]|EA SPORTS FC.*|Warzone|cod|ModernWarfare|BlackOps.*|destiny2|Palworld.*|Helldivers2|NieRAutomata|TheWolfAmongUs|steam|steamwebhelper|EpicGamesLauncher|GalaxyClient|Battle\.net|Agent|EADesktop|EALauncher|UbisoftConnect|upc|XboxPcApp|GamingApp)$' }
 
-  # Barre, fonds d'ecran, lanceur : ignores.
+  # Barre, fonds d'ecran, panneau des raccourcis : ignores.
   - commands: ['ignore']
     match:
-      - window_process: { regex: '(?i)^(zebar|wallpaper32|wallpaper64|ui32|lively|Flow\.Launcher|mamumi-keys)$' }
+      - window_process: { regex: '(?i)^(zebar|wallpaper32|wallpaper64|ui32|lively|mamumi-keys)$' }
       - window_title: { regex: '[Pp]icture.in.[Pp]icture' }
         window_class: { regex: 'Chrome_WidgetWin_1|MozillaDialogClass' }
 
@@ -119,7 +118,8 @@ binding_modes:
 
 keybindings:
   # --- Applications ---
-  - commands: ['shell-exec explorer.exe C:\ProgramData\Mamumi-Os\Flow.lnk']
+  # Menu Demarrer (tape le nom d'une appli).
+  - commands: ['shell-exec C:\ProgramData\Mamumi-Os\flyout.exe start']
     bindings: ['lwin+space']
   - commands: ['shell-exec wt']
     bindings: ['lwin+enter']

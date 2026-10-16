@@ -1,6 +1,6 @@
 # ============================================================
 #  Mamumi-Os - desinstallation
-#  Arrete et desinstalle GlazeWM / Zebar / Flow Launcher, rend la barre Windows,
+#  Arrete et desinstalle GlazeWM / Zebar, rend la barre Windows,
 #  remet le bureau et le terminal comme avant. Les reglages vie privee / pubs
 #  restent (pour TOUT annuler : point de restauration "Avant Mamumi-Os").
 # ============================================================
@@ -10,9 +10,7 @@ if ($a -notmatch '^[oOyY]') { return }
 $Tools = Join-Path $env:ProgramData 'Mamumi-Os'
 
 # 1. Arret de GlazeWM, de la barre et du masquage de la barre Windows
-Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -match 'hide-taskbar\.ps1' } |
-    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
-Get-Process glazewm, zebar, Flow.Launcher, mamumi-keys -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process taskbar-guard, glazewm, zebar, mamumi-keys -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Remove-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name GlazeWM -ErrorAction SilentlyContinue
 
 # 2. Barre Windows normale, icones du bureau, menu Demarrer a gauche
@@ -31,7 +29,7 @@ $glzr = Join-Path $env:USERPROFILE '.glzr'
 if (Test-Path "$glzr.avant-mamumi") { Remove-Item $glzr -Recurse -Force; Rename-Item "$glzr.avant-mamumi" $glzr }
 
 # 4. Desinstallation des logiciels
-foreach ($id in 'glzr-io.glazewm', 'glzr-io.zebar', 'Flow-Launcher.Flow-Launcher') {
+foreach ($id in 'glzr-io.glazewm', 'glzr-io.zebar') {
     winget uninstall --id $id --exact --silent 2>$null | Out-Null
 }
 

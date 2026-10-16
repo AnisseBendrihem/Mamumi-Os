@@ -4,19 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="./styles.css" />
-    <script
-      src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
-      integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo="
-      crossorigin="anonymous"
-    ></script>
   </head>
   <body>
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
-      import React, { useState, useEffect } from 'https://esm.sh/react@18?dev';
-      import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
-      import * as zebar from 'https://esm.sh/zebar@3.0';
+    <!-- Preact + htm (~30x plus leger que React, sans compilateur). Bibliotheques embarquees dans vendor/ : aucun telechargement. -->
+    <script type="module">
+      import { html, render, useState, useEffect } from './vendor/htm@3.1.1/es2022/preact/standalone.bundle.js';
+      import * as zebar from './vendor/zebar@3.3.1/es2022/zebar.bundle.js';
 
       const providers = zebar.createProviderGroup({
         network: { type: 'network' },
@@ -29,259 +24,169 @@
       });
 
       // Lance une commande Windows (autorisee dans zpack.json).
-      function run(program, args) {
-        zebar.shellExec(program, args).catch(err => console.error(err));
-      }
+      const run = (program, args) => zebar.shellExec(program, args).catch(err => console.error(err));
       const openUri = uri => run('explorer', [uri]);
       // Panneau natif Windows via son raccourci (petit programme compile, instantane).
       const openFlyout = panel => run('C:\\ProgramData\\Mamumi-Os\\flyout.exe', [panel]);
 
-      createRoot(document.getElementById('root')).render(<App />);
+      // Toutes les fenetres d'un arbre GlazeWM (y compris dans les sous-conteneurs).
+      const collectWindows = node =>
+        !node ? [] : node.type === 'window' ? [node] : (node.children ?? []).flatMap(collectWindows);
+
+      const speed = m => (m ? `${Math.round(m.siValue)}${m.siUnit}` : '-');
 
       function App() {
         const [output, setOutput] = useState(providers.outputMap);
         const [powerOpen, setPowerOpen] = useState(false);
-        const [volumeOpen, setVolumeOpen] = useState(false);
-        const [calError, setCalError] = useState(null);
-
-        // Ouvre un panneau (widget du meme pack) : 'calendar' ou 'quick'.
-        async function openPanel(name) {
-          setCalError(null);
-          try {
-            await zebar.startWidgetPreset(name, 'default', { packId: zebar.currentWidget().packId });
-          } catch (err) {
-            setCalError(String(err?.message ?? err));
-          }
-        }
-        // Calendrier = panneau natif de Windows (notifications + calendrier).
-        const openCalendar = () => openFlyout('calendar');
 
         useEffect(() => {
-          providers.onOutput(() => setOutput(providers.outputMap));
+          providers.onOutput(() => setOutput({ ...providers.outputMap }));
         }, []);
 
-        // --- Reseau ---
+        const gwm = output.glazewm;
+
+        // --- Reseau (en Ethernet il n'y a pas toujours de passerelle : on regarde l'IP) ---
         const net = output.network;
         const iface = net?.defaultInterface;
-        // En Ethernet il n'y a pas toujours de "passerelle" : on se base sur l'adresse IP.
         const online = !!(iface && (iface.ipv4Addresses?.length || iface.ipv6Addresses?.length));
-
-        function networkIcon() {
+        const netIcon = (() => {
           if (!online) return 'nf-md-wifi_strength_off_outline';
           if (iface.type === 'ethernet') return 'nf-md-ethernet_cable';
           const s = net.defaultGateway?.signalStrength ?? 0;
-          if (s >= 80) return 'nf-md-wifi_strength_4';
-          if (s >= 60) return 'nf-md-wifi_strength_3';
-          if (s >= 40) return 'nf-md-wifi_strength_2';
-          return 'nf-md-wifi_strength_1';
-        }
-
-        function speed(m) {
-          if (!m) return '-';
-          return `${Math.round(m.siValue)}${m.siUnit}`;
-        }
+          return s >= 80 ? 'nf-md-wifi_strength_4' : s >= 60 ? 'nf-md-wifi_strength_3'
+               : s >= 40 ? 'nf-md-wifi_strength_2' : 'nf-md-wifi_strength_1';
+        })();
 
         // --- Son ---
         const dev = output.audio?.defaultPlaybackDevice;
-        const volume = dev ? Math.round(dev.volume) : null;
+        const volume = dev ? Math.round(dev.volume) : 0;
         const muted = !!dev?.isMuted;
-
-        function volumeIcon() {
-          if (muted || volume === 0) return 'nf-md-volume_off';
-          if (volume < 34) return 'nf-md-volume_low';
-          if (volume < 67) return 'nf-md-volume_medium';
-          return 'nf-md-volume_high';
-        }
-
-        function onVolumeWheel(e) {
+        const volIcon = muted || volume === 0 ? 'nf-md-volume_off'
+                      : volume < 34 ? 'nf-md-volume_low' : volume < 67 ? 'nf-md-volume_medium' : 'nf-md-volume_high';
+        const onVolumeWheel = e => {
           if (!dev) return;
-          const next = Math.max(0, Math.min(100, volume + (e.deltaY < 0 ? 5 : -5)));
-          output.audio.setVolume(next);
-        }
-
-        function toggleMute() {
+          output.audio.setVolume(Math.max(0, Math.min(100, volume + (e.deltaY < 0 ? 5 : -5))));
+        };
+        const toggleMute = e => {
+          e.preventDefault();
           if (output.audio?.setMute) output.audio.setMute(!muted);
           else openUri('ms-settings:sound');
-        }
+        };
 
         // --- Fenetres reduites ---
-        function collectWindows(node) {
-          if (!node) return [];
-          if (node.type === 'window') return [node];
-          return (node.children ?? []).flatMap(collectWindows);
-        }
-        const minimizedWindows = output.glazewm
-          ? output.glazewm.currentWorkspaces
-              .flatMap(collectWindows)
-              .filter(w => w.state?.type === 'minimized')
+        const minimized = gwm
+          ? gwm.currentWorkspaces.flatMap(collectWindows).filter(w => w.state?.type === 'minimized')
           : [];
 
-        return (
-          <div className="app">
-            {/* ===== Gauche : espaces de travail + fenetres reduites ===== */}
-            <div className="left">
-              <i className="logo nf nf-md-moon_waning_crescent"></i>
-              {output.glazewm && (
-                <div className="workspaces">
-                  {output.glazewm.currentWorkspaces.map(ws => (
-                    <button
-                      className={`workspace ${ws.hasFocus && 'focused'} ${ws.isDisplayed && 'displayed'}`}
-                      onClick={() => output.glazewm.runCommand(`focus --workspace ${ws.name}`)}
-                      key={ws.name}
-                    >
-                      {ws.displayName ?? ws.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+        const tray = output.systray;
 
-              {minimizedWindows.length > 0 && (
-                <div className="minimized-list">
-                  {minimizedWindows.map(w => (
-                    <button
-                      className="minimized"
-                      key={w.id}
-                      title={w.title}
-                      onClick={() => output.glazewm.runCommand('toggle-minimized', w.id)}
-                    >
-                      <i className="nf nf-md-window_restore"></i>
-                      {w.processName}
-                    </button>
-                  ))}
-                </div>
-              )}
+        return html`
+          <div class="app">
+            <!-- Gauche : espaces de travail + fenetres reduites -->
+            <div class="left">
+              <i class="logo nf nf-md-moon_waning_crescent"></i>
+              ${gwm && html`
+                <div class="workspaces">
+                  ${gwm.currentWorkspaces.map(ws => html`
+                    <button key=${ws.name}
+                      class=${`workspace ${ws.hasFocus ? 'focused' : ''} ${ws.isDisplayed ? 'displayed' : ''}`}
+                      onClick=${() => gwm.runCommand(`focus --workspace ${ws.name}`)}>
+                      ${ws.displayName ?? ws.name}
+                    </button>`)}
+                </div>`}
+              ${minimized.length > 0 && html`
+                <div class="minimized-list">
+                  ${minimized.map(w => html`
+                    <button key=${w.id} class="minimized" title=${w.title}
+                      onClick=${() => gwm.runCommand('toggle-minimized', w.id)}>
+                      <i class="nf nf-md-window_restore"></i>${w.processName}
+                    </button>`)}
+                </div>`}
             </div>
 
-            {/* ===== Centre : date/heure -> calendrier ===== */}
-            <button
-              className="center clock"
-              title="Calendrier"
-              onClick={openCalendar}
-            >
-              {output.date?.formatted}
-              {calError && <span className="cal-error"> ⚠ {calError}</span>}
+            <!-- Centre : date / heure -> calendrier -->
+            <button class="center clock" title="Calendrier" onClick=${() => openFlyout('calendar')}>
+              ${output.date?.formatted}
             </button>
 
-            {/* ===== Droite : systeme ===== */}
-            <div className="right">
-              {output.glazewm?.isPaused && (
-                <button className="pill paused-button" onClick={() => output.glazewm.runCommand('wm-toggle-pause')}>
-                  PAUSE
-                </button>
-              )}
-              {output.glazewm?.bindingModes.map(m => (
-                <button
-                  className="pill binding-mode"
-                  key={m.name}
-                  onClick={() => output.glazewm.runCommand(`wm-disable-binding-mode --name ${m.name}`)}
-                >
-                  {m.displayName ?? m.name}
-                </button>
-              ))}
+            <!-- Droite : systeme -->
+            <div class="right">
+              ${gwm?.isPaused && html`
+                <button class="pill paused-button" onClick=${() => gwm.runCommand('wm-toggle-pause')}>PAUSE</button>`}
+              ${gwm?.bindingModes.map(m => html`
+                <button key=${m.name} class="pill binding-mode"
+                  onClick=${() => gwm.runCommand(`wm-disable-binding-mode --name ${m.name}`)}>
+                  ${m.displayName ?? m.name}
+                </button>`)}
 
-              {/* Zone de notification (Discord, Steam...) : clic gauche / clic droit */}
-              {output.systray?.icons?.length > 0 && (
-                <div className="systray">
-                  {output.systray.icons.map(icon => (
-                    <img
-                      key={icon.id}
-                      src={icon.iconUrl}
-                      title={icon.tooltip}
-                      onClick={e => { e.preventDefault(); output.systray.onLeftClick(icon.id); }}
-                      onContextMenu={e => { e.preventDefault(); output.systray.onRightClick(icon.id); }}
-                      onDoubleClick={e => { e.preventDefault(); output.systray.onLeftDoubleClick(icon.id); }}
-                    />
-                  ))}
-                </div>
-              )}
+              ${tray?.icons?.length > 0 && html`
+                <div class="systray">
+                  ${tray.icons.map(icon => html`
+                    <img key=${icon.id} src=${icon.iconUrl} title=${icon.tooltip}
+                      onClick=${e => { e.preventDefault(); tray.onLeftClick(icon.id); }}
+                      onContextMenu=${e => { e.preventDefault(); tray.onRightClick(icon.id); }}
+                      onDblClick=${e => { e.preventDefault(); tray.onLeftDoubleClick(icon.id); }} />`)}
+                </div>`}
 
-              {/* Internet */}
-              <button
-                className={`module network ${online ? '' : 'offline'}`}
-                title={online ? (iface?.friendlyName ?? 'Connecte') : 'Pas de connexion internet'}
-                onClick={() => openFlyout('quick')}
-              >
-                <i className={`nf ${networkIcon()}`}></i>
-                {online ? (
-                  <span className="dim">
-                    {net.defaultGateway?.ssid ? `${net.defaultGateway.ssid} ` : ''}
-                    {'↓'}{speed(net.traffic?.received)} {'↑'}{speed(net.traffic?.transmitted)}
-                  </span>
-                ) : (
-                  <span>Hors ligne</span>
-                )}
+              <button class=${`module network ${online ? '' : 'offline'}`}
+                title=${online ? (iface?.friendlyName ?? 'Connecte') : 'Pas de connexion internet'}
+                onClick=${() => openFlyout('quick')}>
+                <i class=${`nf ${netIcon}`}></i>
+                ${online
+                  ? html`<span class="dim">${net.defaultGateway?.ssid ? `${net.defaultGateway.ssid} ` : ''}↓${speed(net.traffic?.received)} ↑${speed(net.traffic?.transmitted)}</span>`
+                  : html`<span>Hors ligne</span>`}
               </button>
 
-              {/* Bluetooth */}
-              <button
-                className="module bluetooth"
-                title="Bluetooth"
-                onClick={() => openFlyout('quick')}
-              >
-                <i className="nf nf-md-bluetooth"></i>
+              <button class="module bluetooth" title="Bluetooth" onClick=${() => openFlyout('quick')}>
+                <i class="nf nf-md-bluetooth"></i>
               </button>
 
-              {/* Son */}
-              {dev && (
-                <div className="audio-wrap" onWheel={onVolumeWheel}>
-                  <button
-                    className={`module audio ${muted ? 'muted' : ''}`}
-                    title={`${dev.name} - clic : panneau volume, clic droit : couper, molette : volume`}
-                    onClick={() => openFlyout('volume')}
-                    onContextMenu={e => { e.preventDefault(); toggleMute(); }}
-                  >
-                    <i className={`nf ${volumeIcon()}`}></i>
-                    {muted ? 'muet' : `${volume}%`}
+              ${dev && html`
+                <div class="audio-wrap" onWheel=${onVolumeWheel}>
+                  <button class=${`module audio ${muted ? 'muted' : ''}`}
+                    title=${`${dev.name} - clic : panneau volume, clic droit : couper, molette : volume`}
+                    onClick=${() => openFlyout('volume')}
+                    onContextMenu=${toggleMute}>
+                    <i class=${`nf ${volIcon}`}></i>${muted ? 'muet' : `${volume}%`}
                   </button>
-                </div>
-              )}
+                </div>`}
 
-              {/* RAM / CPU */}
-              {output.memory && (
-                <div className="module memory" title="RAM">
-                  <i className="nf nf-fae-chip"></i>
-                  {Math.round(output.memory.usage)}%
-                </div>
-              )}
-              {output.cpu && (
-                <div className="module cpu" title="Processeur">
-                  <i className="nf nf-oct-cpu"></i>
-                  <span className={output.cpu.usage > 85 ? 'high-usage' : ''}>
-                    {Math.round(output.cpu.usage)}%
-                  </span>
-                </div>
-              )}
+              ${output.memory && html`
+                <div class="module memory" title="RAM">
+                  <i class="nf nf-fae-chip"></i>${Math.round(output.memory.usage)}%
+                </div>`}
+              ${output.cpu && html`
+                <div class="module cpu" title="Processeur">
+                  <i class="nf nf-oct-cpu"></i>
+                  <span class=${output.cpu.usage > 85 ? 'high-usage' : ''}>${Math.round(output.cpu.usage)}%</span>
+                </div>`}
 
-              {/* Alimentation */}
-              <div className="power">
-                {powerOpen && (
-                  <div className="power-menu">
-                    <button title="Verrouiller" onClick={() => { setPowerOpen(false); run('rundll32', ['user32.dll,LockWorkStation']); }}>
-                      <i className="nf nf-md-lock"></i>
+              <div class="power">
+                ${powerOpen && html`
+                  <div class="power-menu">
+                    <button title="Verrouiller" onClick=${() => { setPowerOpen(false); run('rundll32', ['user32.dll,LockWorkStation']); }}>
+                      <i class="nf nf-md-lock"></i>
                     </button>
-                    <button title="Veille" onClick={() => { setPowerOpen(false); run('rundll32', ['powrprof.dll,SetSuspendState', '0,1,0']); }}>
-                      <i className="nf nf-md-sleep"></i>
+                    <button title="Veille" onClick=${() => { setPowerOpen(false); run('rundll32', ['powrprof.dll,SetSuspendState', '0,1,0']); }}>
+                      <i class="nf nf-md-sleep"></i>
                     </button>
-                    <button title="Redemarrer" onClick={() => run('shutdown', ['/r', '/t', '0'])}>
-                      <i className="nf nf-md-restart"></i>
+                    <button title="Redemarrer" onClick=${() => run('shutdown', ['/r', '/t', '0'])}>
+                      <i class="nf nf-md-restart"></i>
                     </button>
-                    <button className="danger" title="Eteindre" onClick={() => run('shutdown', ['/s', '/t', '0'])}>
-                      <i className="nf nf-md-power"></i>
+                    <button class="danger" title="Eteindre" onClick=${() => run('shutdown', ['/s', '/t', '0'])}>
+                      <i class="nf nf-md-power"></i>
                     </button>
-                  </div>
-                )}
-                <button
-                  className={`module power-button ${powerOpen ? 'open' : ''}`}
-                  title="Alimentation"
-                  onClick={() => setPowerOpen(!powerOpen)}
-                >
-                  <i className={`nf ${powerOpen ? 'nf-md-close' : 'nf-md-power'}`}></i>
+                  </div>`}
+                <button class=${`module power-button ${powerOpen ? 'open' : ''}`} title="Alimentation"
+                  onClick=${() => setPowerOpen(!powerOpen)}>
+                  <i class=${`nf ${powerOpen ? 'nf-md-close' : 'nf-md-power'}`}></i>
                 </button>
               </div>
             </div>
-          </div>
-        );
+          </div>`;
       }
+
+      render(html`<${App} />`, document.getElementById('root'));
     </script>
   </body>
 </html>

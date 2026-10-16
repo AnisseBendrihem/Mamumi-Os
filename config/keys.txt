@@ -4,8 +4,7 @@
 // Une ligne sans commande est affichee comme simple aide.
 
 # Applications
-Win + Espace | Lanceur d'applis (Flow) | run:%LOCALAPPDATA%\FlowLauncher\Flow.Launcher.exe
-Win | Menu Démarrer | send:LWIN
+Win  ou  Win + Espace | Menu Démarrer (tape le nom d'une appli) | send:LWIN
 Win + Entrée | Terminal | run:wt.exe
 Win + B | Navigateur | run:%ProgramData%\Mamumi-Os\Browser.lnk
 

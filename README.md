@@ -64,14 +64,24 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
 
 ## 📦 Ce que ça fait (en détail)
 
-### 1. Logiciels installés (2 seulement, gratuits et open source)
+### 1. Un seul logiciel installé (gratuit et open source)
 | Logiciel | Rôle |
 |---|---|
 | [**GlazeWM**](https://github.com/glzr-io/glazewm) | Gestionnaire de fenêtres en mosaïque (comme Hyprland sur Omarchy). Il inclut **Zebar**, la barre du haut |
-| [**Flow Launcher**](https://github.com/Flow-Launcher/Flow.Launcher) | Lanceur d'applis centré (**Win + Espace**), comme *Walker* sur Omarchy |
 
-### 2. Fenêtres en mosaïque (GlazeWM)
-- Les fenêtres se **rangent toutes seules** côte à côte, sans jamais se chevaucher, avec un espace de 10 px entre elles.
+Le reste est fait avec ce qui est **déjà dans Windows** : de petits programmes compilés à l'installation avec le compilateur intégré à Windows, et des réglages.
+
+### 2. Fenêtres en mosaïque, en spirale comme Hyprland
+- Les fenêtres se **rangent toutes seules**, sans jamais se chevaucher, avec un espace de 10 px entre elles.
+- **Disposition en spirale (« dwindle »)**, comme sur Omarchy. Une fenêtre active **plus large que haute** fait s'ouvrir la suivante **à côté**, une fenêtre **plus haute que large** la fait s'ouvrir **en dessous** :
+  ```
+  ┌────────┐   ┌────┬────┐   ┌────┬────┐   ┌────┬────┐
+  │   A    │ → │ A  │ B  │ → │ A  │ B  │ → │ A  │ B  │
+  │        │   │    │    │   │    ├────┤   │    ├──┬─┤
+  │        │   │    │    │   │    │ C  │   │    │C │D│
+  └────────┘   └────┴────┘   └────┴────┘   └────┴──┴─┘
+  ```
+  Pour revenir à des colonnes simples, crée un fichier vide `C:\ProgramData\Mamumi-Os\autotiling.off`.
 - **Bordure bleue** sur la fenêtre active, grise sur les autres.
 - **9 espaces de travail** (bureaux virtuels).
 - Les **jeux et launchers** (Steam, Epic, Riot, Battle.net, EA, Ubisoft, Xbox…) sont **ignorés** : ils fonctionnent normalement.
@@ -80,6 +90,9 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
 
 ### 3. Barre du haut Tokyo Night (Zebar)
 Elle remplace la barre des tâches Windows, qui est **cachée**. Détails dans [La barre du haut](#-la-barre-du-haut).
+- **Légère** : écrite avec Preact + htm (≈ 30× plus léger que React, sans compilateur au démarrage).
+- **Aucune dépendance Internet** : ses bibliothèques et sa police d'icônes sont **embarquées**, pour qu'elle s'affiche même hors ligne.
+- **Relancée automatiquement** si elle plante.
 
 ### 4. Thème Tokyo Night partout
 | Élément | Changement |
@@ -88,7 +101,6 @@ Elle remplace la barre des tâches Windows, qui est **cachée**. Détails dans [
 | Menu Démarrer | Fond bleu nuit `#1f2335`, **centré**, **épuré** : plus de section « Recommandé », de fichiers récents ou de suggestions, et plus de place pour les épingles |
 | Panneaux Windows (Wi-Fi, volume, calendrier) | Bleu nuit |
 | Windows Terminal | Palette Tokyo Night, police Cascadia Mono, légère transparence, marges, sans barre de défilement. **Tes profils sont conservés** |
-| Flow Launcher | Thème Tokyo Night sur mesure |
 | Bureau | Icônes masquées, pour un bureau propre comme sur Omarchy |
 
 ### 5. Pubs, IA et vie privée
@@ -122,7 +134,7 @@ Un petit panneau Tokyo Night, **centré**, qui liste tous les raccourcis, comme 
 - **↑ ↓** pour naviguer, **Entrée** (ou un clic) pour **exécuter** le raccourci ;
 - **Échap**, un clic ailleurs ou **Win + K** pour fermer.
 
-Il est aussi accessible depuis le lanceur : **Win + Espace**, puis « rac ». C'est un mini-programme compilé à l'installation : il ne consomme rien quand il est fermé, et environ 25 Mo quand il est ouvert.
+Il est aussi accessible depuis le menu Démarrer : **Win**, puis « rac ». C'est un mini-programme compilé à l'installation : il ne consomme rien quand il est fermé, et environ 25 Mo quand il est ouvert.
 
 La liste se modifie dans `C:\ProgramData\Mamumi-Os\keys.txt` :
 ```
@@ -147,8 +159,7 @@ La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]`
 ### Applications
 | Raccourci | Action |
 |---|---|
-| **Win + Espace** | Lanceur d'applis centré (Flow) : tape le nom, puis Entrée |
-| **Win** (seul) | Menu Démarrer : tape directement le nom de l'appli |
+| **Win** ou **Win + Espace** | Menu Démarrer : tape directement le nom de l'appli, puis Entrée |
 | **Win + Entrée** | Terminal |
 | **Win + B** | Navigateur (ton navigateur par défaut) |
 
@@ -247,7 +258,7 @@ Les **5 dernières versions** sont gardées, plus une copie `derniere` que la r�
 ### Désinstaller
 👉 **Win**, tape **« Désinstaller Mamumi-Os »**, **Entrée**.
 
-Ça arrête et désinstalle GlazeWM, Zebar et Flow, fait revenir la barre Windows et les icônes du bureau, et restaure l'ancienne config du terminal.
+Ça arrête et désinstalle GlazeWM et Zebar, fait revenir la barre Windows et les icônes du bureau, et restaure l'ancienne config du terminal.
 
 **Pour TOUT annuler**, y compris les réglages vie privée et les applis supprimées : **Panneau de configuration → Récupération → Ouvrir la Restauration du système**, puis choisis le point **« Avant Mamumi-Os »**.
 
@@ -268,7 +279,10 @@ Les **5 dernières versions** sont gardées, plus une copie `derniere` que la r�
 → C'est normal : Windows impose leur position, et elle ne peut pas être changée.
 
 **Win + Espace change ma langue de clavier.**
-→ Uniquement quand GlazeWM est en pause ou fermé. Sinon, Win + Espace ouvre le lanceur.
+→ Uniquement quand GlazeWM est en pause ou fermé. Sinon, Win + Espace ouvre le menu Démarrer.
+
+**Ça consomme combien ?**
+→ Environ **450 Mo de RAM** au total (GlazeWM ≈ 10 Mo, la barre ≈ 400 Mo, la garde et la spirale ≈ 25 Mo) et **≈ 0,2 % de processeur**. Aucun impact sur les FPS en jeu. La barre est la plus gourmande, parce que Zebar l'affiche avec le moteur d'Edge (WebView2).
 
 **Je veux modifier un raccourci.**
 → `%USERPROFILE%\.glzr\glazewm\config.yaml`, section `keybindings`, puis **Win + Shift + R**. Pense à mettre à jour aussi la liste du panneau **Win + K** (`C:\ProgramData\Mamumi-Os\keys.txt`). ⚠️ GlazeWM ne sait pas lancer un chemin **contenant un espace ou entre guillemets** : utilise un raccourci `.lnk` placé dans `C:\ProgramData\Mamumi-Os\` (exemple : `shell-exec explorer.exe C:\ProgramData\Mamumi-Os\MonAppli.lnk`).
@@ -324,13 +338,14 @@ Mamumi-Os/
 ├── config/
 │   ├── glazewm/config.yaml      # raccourcis, couleurs, jeux ignorés, espaces de travail
 │   ├── zebar/settings.json      # quelle barre lancer
-│   ├── zebar/tokyo-night/       # la barre du haut (HTML/React + CSS + permissions)
+│   ├── zebar/tokyo-night/       # la barre du haut (Preact + htm, CSS, permissions)
+│   │   └── vendor/              #   bibliothèques et police d'icônes embarquées (zéro Internet)
 │   ├── keys.txt                 # liste du panneau des raccourcis (Win + K)
-│   ├── flow/Tokyo Night.xaml    # thème du lanceur
 │   └── terminal/tokyo-night.json# palette et réglages de Windows Terminal (fusionnés, pas écrasés)
 └── tools/
-    ├── hide-taskbar.ps1         # cache la barre Windows + relance la barre du haut si elle plante
-    │                            # + rend la barre Windows si GlazeWM n'est plus là
+    ├── taskbar-guard.cs         # programme compilé : cache la barre Windows, relance la barre du haut
+    │                            #   si elle plante, rend la barre Windows si GlazeWM n'est plus là,
+    │                            #   et range les fenêtres en spirale (via l'IPC de GlazeWM)
     ├── flyout.cs                # mini-programme (compilé à l'installation avec le compilateur
     │                            #   intégré à Windows) qui ouvre les panneaux natifs instantanément
     ├── keys.cs                  # panneau des raccourcis Win + K (compilé à l'installation)
@@ -339,7 +354,8 @@ Mamumi-Os/
 ```
 
 **Choix techniques :**
-- **Aucun logiciel en plus** de GlazeWM et Flow : tout le reste utilise ce qui est déjà dans Windows (registre, PowerShell 5.1, compilateur C# du .NET Framework).
+- **Aucun logiciel en plus** de GlazeWM : tout le reste utilise ce qui est déjà dans Windows (registre, PowerShell 5.1, compilateur C# du .NET Framework).
+- Ce qui tourne en fond est **compilé** plutôt qu'écrit en PowerShell : environ 25 Mo au lieu d'environ 80 Mo.
 - Les outils sont dans `C:\ProgramData\Mamumi-Os`, un chemin **sans espace**, parce que GlazeWM ne sait pas lancer un chemin entre guillemets.
 - Les panneaux natifs passent par un **petit `.exe` compilé** plutôt que par PowerShell : on passe d'environ 1 s de délai à un lancement instantané.
 - Les configs existantes sont **sauvegardées avant d'être modifiées** (`*.avant-mamumi`). La config du terminal est **fusionnée**, pas écrasée.
@@ -350,7 +366,8 @@ Mamumi-Os/
 
 - [Omarchy](https://omarchy.org) par DHH, l'inspiration
 - [GlazeWM et Zebar](https://github.com/glzr-io) par glzr-io
-- [Flow Launcher](https://github.com/Flow-Launcher/Flow.Launcher)
+- [Preact](https://preactjs.com) et [htm](https://github.com/developit/htm), pour la barre
+- L'idée de la spirale vient des scripts d'« autotiling » cités par GlazeWM ([GAT-GWM](https://github.com/Dutch-Raptor/GAT-GWM))
 - Palette [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme) par enkia
 
 Licence : MIT. Utilise, modifie et partage librement.
