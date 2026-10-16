@@ -1,0 +1,217 @@
+# ==========================================================
+#  Mamumi-Os - GlazeWM facon Omarchy (Tokyo Night, touche Win)
+#  Recharger apres modification : Win + Shift + R
+#  Les outils sont dans C:\ProgramData\Mamumi-Os (chemin sans espace :
+#  GlazeWM ne sait pas lancer un chemin entre guillemets).
+# ==========================================================
+
+general:
+  # Lance la barre du haut, cache la barre Windows, lance le lanceur Flow.
+  startup_commands:
+    - 'shell-exec zebar'
+    - 'shell-exec conhost.exe --headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\ProgramData\Mamumi-Os\hide-taskbar.ps1'
+    - 'shell-exec explorer.exe C:\ProgramData\Mamumi-Os\Flow.lnk'
+  # A la fermeture de GlazeWM : la barre Windows reapparait.
+  shutdown_commands:
+    - 'shell-exec taskkill /IM zebar.exe /F'
+    - 'shell-exec conhost.exe --headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\ProgramData\Mamumi-Os\hide-taskbar.ps1 -Show'
+  config_reload_commands: []
+  focus_follows_cursor: false
+  toggle_workspace_on_refocus: false
+  cursor_jump:
+    enabled: true
+    trigger: 'monitor_focus'
+  hide_method: 'cloak'
+  show_all_in_taskbar: false
+
+gaps:
+  scale_with_dpi: true
+  inner_gap: '10px'
+  # Le haut laisse la place a la barre.
+  outer_gap:
+    top: '48px'
+    right: '10px'
+    bottom: '10px'
+    left: '10px'
+
+window_effects:
+  # Bordure bleue Tokyo Night sur la fenetre active.
+  focused_window:
+    border:
+      enabled: true
+      color: '#7aa2f7'
+    hide_title_bar:
+      enabled: false
+    corner_style:
+      enabled: false
+      style: 'square'
+    transparency:
+      enabled: false
+      opacity: '90%'
+  other_windows:
+    border:
+      enabled: true
+      color: '#414868'
+    hide_title_bar:
+      enabled: false
+    corner_style:
+      enabled: false
+      style: 'square'
+    transparency:
+      enabled: false
+      opacity: '0%'
+
+window_behavior:
+  initial_state: 'tiling'
+  state_defaults:
+    floating:
+      centered: true
+      shown_on_top: false
+    fullscreen:
+      maximized: false
+      shown_on_top: false
+
+workspaces:
+  - name: '1'
+  - name: '2'
+  - name: '3'
+  - name: '4'
+  - name: '5'
+  - name: '6'
+  - name: '7'
+  - name: '8'
+  - name: '9'
+
+window_rules:
+  # Jeux et launchers courants : GlazeWM ne les touche pas.
+  # Un jeu manque ? Ajoute son nom de processus ici, ou Win + Shift + P pour mettre en pause.
+  - commands: ['ignore']
+    match:
+      - window_process: { regex: '(?i)^(VALORANT.*|League of Legends|LeagueClient.*|Riot.*|FortniteClient.*|FortniteLauncher|cs2|csgo|dota2|r5apex.*|RainbowSix.*|RocketLeague|GTA5|PlayGTAV|RDR2|eldenring|DarkSoulsIII|sekiro|bg3.*|Cyberpunk2077|witcher3|DOOMEternal.*|StreetFighter6|Overwatch|Minecraft.*|javaw|FC2[0-9]|EA SPORTS FC.*|Warzone|cod|ModernWarfare|BlackOps.*|destiny2|Palworld.*|Helldivers2|NieRAutomata|TheWolfAmongUs|steam|steamwebhelper|EpicGamesLauncher|GalaxyClient|Battle\.net|Agent|EADesktop|EALauncher|UbisoftConnect|upc|XboxPcApp|GamingApp)$' }
+
+  # Barre, fonds d'ecran, lanceur : ignores.
+  - commands: ['ignore']
+    match:
+      - window_process: { regex: '(?i)^(zebar|wallpaper32|wallpaper64|ui32|lively|Flow\.Launcher)$' }
+      - window_title: { regex: '[Pp]icture.in.[Pp]icture' }
+        window_class: { regex: 'Chrome_WidgetWin_1|MozillaDialogClass' }
+
+  # Petites fenetres qui doivent flotter.
+  - commands: ['set-floating --centered']
+    match:
+      - window_process: { regex: '(?i)^(Taskmgr|SnippingTool|Calculator.*|CalculatorApp)$' }
+      - window_class: { equals: '#32770' }
+
+binding_modes:
+  # Win + R puis fleches pour redimensionner, Echap pour sortir.
+  - name: 'resize'
+    keybindings:
+      - commands: ['resize --width -3%']
+        bindings: ['left']
+      - commands: ['resize --width +3%']
+        bindings: ['right']
+      - commands: ['resize --height +3%']
+        bindings: ['up']
+      - commands: ['resize --height -3%']
+        bindings: ['down']
+      - commands: ['wm-disable-binding-mode --name resize']
+        bindings: ['escape', 'enter']
+
+keybindings:
+  # --- Applications ---
+  - commands: ['shell-exec explorer.exe C:\ProgramData\Mamumi-Os\Flow.lnk']
+    bindings: ['lwin+space']
+  - commands: ['shell-exec wt']
+    bindings: ['lwin+enter']
+  - commands: ['shell-exec explorer.exe C:\ProgramData\Mamumi-Os\Browser.lnk']
+    bindings: ['lwin+b']
+
+  # --- Fenetres ---
+  - commands: ['close']
+    bindings: ['lwin+w']
+  - commands: ['toggle-fullscreen']
+    bindings: ['lwin+f']
+  - commands: ['toggle-floating --centered']
+    bindings: ['lwin+t']
+  - commands: ['toggle-tiling-direction']
+    bindings: ['lwin+j']
+  - commands: ['toggle-minimized']
+    bindings: ['lwin+m']
+  - commands: ['wm-enable-binding-mode --name resize']
+    bindings: ['lwin+r']
+
+  # --- Focus (Win + fleches) ---
+  - commands: ['focus --direction left']
+    bindings: ['lwin+left']
+  - commands: ['focus --direction right']
+    bindings: ['lwin+right']
+  - commands: ['focus --direction up']
+    bindings: ['lwin+up']
+  - commands: ['focus --direction down']
+    bindings: ['lwin+down']
+
+  # --- Deplacer la fenetre (Win + Shift + fleches) ---
+  - commands: ['move --direction left']
+    bindings: ['lwin+shift+left']
+  - commands: ['move --direction right']
+    bindings: ['lwin+shift+right']
+  - commands: ['move --direction up']
+    bindings: ['lwin+shift+up']
+  - commands: ['move --direction down']
+    bindings: ['lwin+shift+down']
+
+  # --- Espaces de travail ---
+  - commands: ['focus --next-active-workspace']
+    bindings: ['lwin+tab']
+  - commands: ['focus --prev-active-workspace']
+    bindings: ['lwin+shift+tab']
+  - commands: ['focus --workspace 1']
+    bindings: ['lwin+1']
+  - commands: ['focus --workspace 2']
+    bindings: ['lwin+2']
+  - commands: ['focus --workspace 3']
+    bindings: ['lwin+3']
+  - commands: ['focus --workspace 4']
+    bindings: ['lwin+4']
+  - commands: ['focus --workspace 5']
+    bindings: ['lwin+5']
+  - commands: ['focus --workspace 6']
+    bindings: ['lwin+6']
+  - commands: ['focus --workspace 7']
+    bindings: ['lwin+7']
+  - commands: ['focus --workspace 8']
+    bindings: ['lwin+8']
+  - commands: ['focus --workspace 9']
+    bindings: ['lwin+9']
+
+  # --- Envoyer la fenetre vers un espace (Win + Shift + chiffre) ---
+  - commands: ['move --workspace 1', 'focus --workspace 1']
+    bindings: ['lwin+shift+1']
+  - commands: ['move --workspace 2', 'focus --workspace 2']
+    bindings: ['lwin+shift+2']
+  - commands: ['move --workspace 3', 'focus --workspace 3']
+    bindings: ['lwin+shift+3']
+  - commands: ['move --workspace 4', 'focus --workspace 4']
+    bindings: ['lwin+shift+4']
+  - commands: ['move --workspace 5', 'focus --workspace 5']
+    bindings: ['lwin+shift+5']
+  - commands: ['move --workspace 6', 'focus --workspace 6']
+    bindings: ['lwin+shift+6']
+  - commands: ['move --workspace 7', 'focus --workspace 7']
+    bindings: ['lwin+shift+7']
+  - commands: ['move --workspace 8', 'focus --workspace 8']
+    bindings: ['lwin+shift+8']
+  - commands: ['move --workspace 9', 'focus --workspace 9']
+    bindings: ['lwin+shift+9']
+
+  # --- GlazeWM ---
+  - commands: ['wm-reload-config']
+    bindings: ['lwin+shift+r']
+  - commands: ['wm-redraw']
+    bindings: ['lwin+shift+w']
+  # Pause totale (pour jouer tranquille) : Win + Shift + P
+  - commands: ['wm-toggle-pause']
+    bindings: ['lwin+shift+p']
+  # Quitter GlazeWM (la barre Windows revient) : Win + Shift + Echap
+  - commands: ['wm-exit']
+    bindings: ['lwin+shift+escape']

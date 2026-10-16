@@ -1,0 +1,68 @@
+{
+  "$schema": "https://github.com/glzr-io/zebar/raw/v3.0.0/resources/zpack-schema.json",
+  "name": "tokyo-night",
+  "version": "1.0.0",
+  "description": "Barre du haut facon Omarchy, theme Tokyo Night.",
+  "tags": [
+    "topbar"
+  ],
+  "previewImages": [],
+  "repositoryUrl": "",
+  "widgets": [
+    {
+      "name": "bar",
+      "htmlPath": "./bar.html",
+      "zOrder": "normal",
+      "shownInTaskbar": false,
+      "focused": false,
+      "resizable": false,
+      "transparent": true,
+      "includeFiles": [
+        "*.html",
+        "*.css"
+      ],
+      "caching": {
+        "defaultDuration": 604800,
+        "rules": []
+      },
+      "privileges": {
+        "shellCommands": [
+          {
+            "program": "explorer",
+            "argsRegex": "^(ms-settings:[a-z-]+|ms-actioncenter:.*)$"
+          },
+          {
+            "program": "rundll32",
+            "argsRegex": "^(user32\\.dll,LockWorkStation|powrprof\\.dll,SetSuspendState 0,1,0)$"
+          },
+          {
+            "program": "C:\\ProgramData\\Mamumi-Os\\flyout.exe",
+            "argsRegex": "^(quick|volume|calendar)$"
+          },
+          {
+            "program": "shutdown",
+            "argsRegex": "^/[rs] /t 0$"
+          }
+        ]
+      },
+      "presets": [
+        {
+          "name": "default",
+          "anchor": "top_left",
+          "offsetX": "0px",
+          "offsetY": "0px",
+          "width": "100%",
+          "height": "36px",
+          "monitorSelection": {
+            "type": "all"
+          },
+          "dockToEdge": {
+            "enabled": false,
+            "edge": null,
+            "windowMargin": "0px"
+          }
+        }
+      ]
+    }
+  ]
+}

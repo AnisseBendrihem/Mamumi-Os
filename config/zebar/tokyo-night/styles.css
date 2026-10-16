@@ -1,0 +1,329 @@
+/* Icones Nerd Font chargees depuis le web (rien a installer). */
+@import 'https://www.nerdfonts.com/assets/css/webfont.css';
+
+/* Palette Tokyo Night */
+:root {
+  --bg: rgba(26 27 38 / 100%);      /* #1a1b26, opaque */
+  --bg-alt: rgba(36 40 59 / 100%);  /* #24283b */
+  --fg: #c0caf5;
+  --fg-dim: #565f89;
+  --blue: #7aa2f7;
+  --purple: #bb9af7;
+  --cyan: #7dcfff;
+  --green: #9ece6a;
+  --red: #f7768e;
+  --border: #414868;
+
+  --text-size: 13px;
+  --icon-size: 13px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  color: var(--fg);
+  font-family: 'Cascadia Mono', 'Cascadia Code', Consolas, ui-monospace, monospace;
+  font-size: var(--text-size);
+  overflow: hidden;
+}
+
+div,
+span,
+p {
+  cursor: default;
+  user-select: none;
+}
+
+#root {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 100%;
+  padding: 0 14px;
+}
+
+.left,
+.center,
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.center {
+  justify-self: center;
+  color: var(--fg);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.right {
+  justify-self: end;
+}
+
+i {
+  margin-right: 6px;
+  font-size: var(--icon-size);
+  color: var(--blue);
+}
+
+.logo {
+  color: var(--purple);
+  margin-right: 14px;
+  font-size: 15px;
+}
+
+/* Espaces de travail */
+.workspaces {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.workspace {
+  background: transparent;
+  color: var(--fg-dim);
+  font-family: inherit;
+  font-size: var(--text-size);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 9px;
+  cursor: pointer;
+
+  &.displayed {
+    color: var(--fg);
+  }
+
+  &.focused {
+    background: var(--bg-alt);
+    color: var(--blue);
+    font-weight: 700;
+  }
+
+  &:hover {
+    color: var(--cyan);
+  }
+}
+
+/* Fenetres reduites */
+.minimized-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+}
+
+.minimized {
+  background: var(--bg-alt);
+  color: var(--fg-dim);
+  font-family: inherit;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  max-width: 140px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+
+  & i {
+    color: var(--purple);
+  }
+
+  &:hover {
+    color: var(--cyan);
+  }
+}
+
+/* Horloge cliquable (calendrier) */
+.clock {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-size);
+  color: var(--fg);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-alt);
+    color: var(--blue);
+  }
+}
+
+/* Modules de droite */
+.module {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-size);
+  color: var(--fg);
+  margin-left: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+button.module {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-alt);
+  }
+}
+
+.dim {
+  color: var(--fg-dim);
+}
+
+.network.offline,
+.network.offline i {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.audio.muted,
+.audio.muted i {
+  color: var(--fg-dim);
+}
+
+/* Zone de notification */
+.systray {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+  padding-right: 10px;
+  border-right: 1px solid var(--border);
+
+  & img {
+    width: 14px;
+    height: 14px;
+    padding: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    /* Discret : gris et transparent, couleur au survol. */
+    filter: grayscale(100%);
+    opacity: 0.4;
+    transition: opacity 0.15s, filter 0.15s;
+
+    &:hover {
+      background: var(--bg-alt);
+      filter: none;
+      opacity: 1;
+    }
+  }
+}
+
+/* Volume : curseur */
+.audio-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.volume-slider {
+  width: 90px;
+  margin-left: 6px;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.cal-error {
+  color: var(--red);
+  font-size: 11px;
+}
+
+/* Menu alimentation */
+.power {
+  display: flex;
+  align-items: center;
+}
+
+.power-menu {
+  display: flex;
+  gap: 2px;
+  margin-left: 6px;
+  padding: 2px;
+  background: var(--bg-alt);
+  border-radius: 4px;
+
+  & button {
+    background: transparent;
+    border: none;
+    padding: 3px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    & i {
+      margin: 0;
+      color: var(--fg);
+    }
+
+    &:hover {
+      background: var(--border);
+    }
+
+    &.danger:hover i {
+      color: var(--red);
+    }
+  }
+}
+
+.power-button i {
+  margin: 0;
+  color: var(--red);
+}
+
+.power-button.open i {
+  color: var(--fg-dim);
+}
+
+.pill,
+.binding-mode,
+.tiling-direction,
+.paused-button {
+  background: var(--bg-alt);
+  color: var(--purple);
+  font-family: inherit;
+  border: 0;
+  border-radius: 4px;
+  line-height: 1;
+  padding: 4px 8px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.paused-button {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.cpu .high-usage {
+  color: var(--red);
+}
+
+.battery {
+  position: relative;
+}
+
+.battery .charging-icon {
+  position: absolute;
+  font-size: 7px;
+  left: -8px;
+  top: 3px;
+}
