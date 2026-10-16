@@ -12,7 +12,7 @@ $Tools = Join-Path $env:ProgramData 'Mamumi-Os'
 # 1. Arret de GlazeWM, de la barre et du masquage de la barre Windows
 Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -match 'hide-taskbar\.ps1' } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
-Get-Process glazewm, zebar, Flow.Launcher -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process glazewm, zebar, Flow.Launcher, mamumi-keys -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Remove-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name GlazeWM -ErrorAction SilentlyContinue
 
 # 2. Barre Windows normale, icones du bureau, menu Demarrer a gauche
@@ -37,7 +37,7 @@ foreach ($id in 'glzr-io.glazewm', 'glzr-io.zebar', 'Flow-Launcher.Flow-Launcher
 
 # 5. Raccourcis et outils
 $sm = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
-Remove-Item "$sm\Reparer Mamumi-Os.lnk", "$sm\Sauvegarder Mamumi-Os.lnk", "$sm\Desinstaller Mamumi-Os.lnk" -ErrorAction SilentlyContinue
+Remove-Item "$sm\Reparer Mamumi-Os.lnk", "$sm\Sauvegarder Mamumi-Os.lnk", "$sm\Desinstaller Mamumi-Os.lnk", "$sm\Raccourcis clavier.lnk" -ErrorAction SilentlyContinue
 Start-Process powershell.exe -ArgumentList "-NoProfile -Command Start-Sleep 2; Remove-Item '$Tools' -Recurse -Force"
 
 # 6. Relance de l'Explorateur (la barre Windows revient)

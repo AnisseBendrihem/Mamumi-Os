@@ -92,7 +92,7 @@ window_rules:
   # Barre, fonds d'ecran, lanceur : ignores.
   - commands: ['ignore']
     match:
-      - window_process: { regex: '(?i)^(zebar|wallpaper32|wallpaper64|ui32|lively|Flow\.Launcher)$' }
+      - window_process: { regex: '(?i)^(zebar|wallpaper32|wallpaper64|ui32|lively|Flow\.Launcher|mamumi-keys)$' }
       - window_title: { regex: '[Pp]icture.in.[Pp]icture' }
         window_class: { regex: 'Chrome_WidgetWin_1|MozillaDialogClass' }
 
@@ -123,6 +123,9 @@ keybindings:
     bindings: ['lwin+space']
   - commands: ['shell-exec wt']
     bindings: ['lwin+enter']
+  # Panneau de tous les raccourcis, navigable (comme Super + K sur Omarchy).
+  - commands: ['shell-exec C:\ProgramData\Mamumi-Os\mamumi-keys.exe']
+    bindings: ['lwin+k']
   - commands: ['shell-exec explorer.exe C:\ProgramData\Mamumi-Os\Browser.lnk']
     bindings: ['lwin+b']
 

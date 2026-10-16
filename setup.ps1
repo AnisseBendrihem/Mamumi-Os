@@ -121,6 +121,18 @@ if (-not (Test-Path "$Tools\flyout.exe") -or -not $Repair) {
 }
 if (Test-Path "$Tools\flyout.exe") { Ok 'flyout.exe compile (ouvre les panneaux Windows depuis la barre)' } else { Warn 'Compilation de flyout.exe echouee' }
 
+# Panneau des raccourcis (Win + K) : liste dans keys.txt, modifiable
+Get-Process mamumi-keys -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+if (-not (Test-Path "$Tools\mamumi-keys.exe") -or -not $Repair) {
+    & $csc /nologo /target:winexe /optimize+ /codepage:65001 /r:System.Windows.Forms.dll /r:System.Drawing.dll /out:"$Tools\mamumi-keys.exe" "$repoCopy\tools\keys.cs" | Out-Null
+}
+if (-not (Test-Path "$Tools\keys.txt")) {
+    $fromBackup = Join-Path (Get-BackupDir) 'derniere\keys.txt'
+    if ($Repair -and (Test-Path $fromBackup)) { Copy-Item $fromBackup "$Tools\keys.txt" -Force }
+    else { Copy-Item "$repoCopy\config\keys.txt" "$Tools\keys.txt" -Force }
+}
+if (Test-Path "$Tools\mamumi-keys.exe") { Ok 'Panneau des raccourcis compile (Win + K)' } else { Warn 'Compilation du panneau des raccourcis echouee' }
+
 # Navigateur par defaut -> raccourci Browser.lnk (Win + B)
 $browser = $null
 $progId = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice' -ErrorAction SilentlyContinue).ProgId
@@ -299,6 +311,7 @@ $sm = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
 $ps = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 New-Shortcut "$sm\Reparer Mamumi-Os.lnk" $ps "-NoProfile -ExecutionPolicy Bypass -File `"$repoCopy\setup.ps1`" -Repair" "$env:SystemRoot\System32\shell32.dll,238"
 New-Shortcut "$sm\Sauvegarder Mamumi-Os.lnk" $ps "-NoProfile -ExecutionPolicy Bypass -File `"$repoCopy\tools\backup.ps1`"" "$env:SystemRoot\System32\shell32.dll,258"
+New-Shortcut "$sm\Raccourcis clavier.lnk" "$Tools\mamumi-keys.exe" '' "$env:SystemRoot\System32\main.cpl,0"
 New-Shortcut "$sm\Desinstaller Mamumi-Os.lnk" $ps "-NoProfile -ExecutionPolicy Bypass -File `"$repoCopy\tools\uninstall.ps1`"" "$env:SystemRoot\System32\shell32.dll,131"
 & $ps -NoProfile -ExecutionPolicy Bypass -File "$repoCopy\tools\backup.ps1"
 Ok "Sauvegarde dans $(Get-BackupDir)"
@@ -320,6 +333,7 @@ Write-Host @"
  =========================================================
   Termine ! Redemarre le PC pour tout finaliser.
 
+  Win + K          TOUS les raccourcis (navigable, Entree = executer)
   Win + Entree     terminal         Win + Espace   lanceur
   Win + B          navigateur       Win + W        fermer
   Win + fleches    changer de fenetre

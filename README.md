@@ -116,7 +116,22 @@ Epic Games, GOG Galaxy, Riot Client, Teams, OneDrive, lancement auto d'Edge, Ado
 ### 9. Nettoyage
 Fichiers temporaires (utilisateur et Windows), cache de Windows Update, crash dumps, cache Internet et corbeille.
 
-### 10. Outils d'entretien (menu Démarrer)
+### 10. Panneau des raccourcis (Win + K)
+Un petit panneau Tokyo Night, **centré**, qui liste tous les raccourcis, comme sur Omarchy :
+- **tape** pour filtrer (« plein » trouve « Plein écran », sans tenir compte des accents) ;
+- **↑ ↓** pour naviguer, **Entrée** (ou un clic) pour **exécuter** le raccourci ;
+- **Échap**, un clic ailleurs ou **Win + K** pour fermer.
+
+Il est aussi accessible depuis le lanceur : **Win + Espace**, puis « rac ». C'est un mini-programme compilé à l'installation : il ne consomme rien quand il est fermé, et environ 25 Mo quand il est ouvert.
+
+La liste se modifie dans `C:\ProgramData\Mamumi-Os\keys.txt` :
+```
+# Section
+Touches | Ce que ça fait | commande lancée avec Entrée (optionnelle)
+```
+La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]` ou `send:<touches>`. Une ligne sans commande s'affiche en gris, comme simple aide.
+
+### 11. Outils d'entretien (menu Démarrer)
 - **Réparer Mamumi-Os** : remet tout en place après une mise à jour Windows.
 - **Sauvegarder Mamumi-Os** : sauvegarde ta config.
 - **Désinstaller Mamumi-Os** : revient en arrière.
@@ -126,6 +141,8 @@ Fichiers temporaires (utilisateur et Windows), cache de Windows Update, crash du
 ## ⌨️ Les raccourcis clavier
 
 > Toutes les touches utilisent **Win** (la touche Windows), comme **Super** sur Omarchy.
+>
+> 🆘 **Tu as oublié un raccourci ? Fais Win + K** : un panneau centré liste **tous** les raccourcis. Tape pour filtrer, **↑ ↓** pour naviguer, **Entrée** pour exécuter le raccourci sélectionné. C'est le même principe que le menu des raccourcis d'Omarchy.
 
 ### Applications
 | Raccourci | Action |
@@ -157,6 +174,7 @@ Fichiers temporaires (utilisateur et Windows), cache de Windows Update, crash du
 ### Système
 | Raccourci | Action |
 |---|---|
+| **Win + K** | 📋 **Panneau de tous les raccourcis** : filtre, navigation, Entrée pour exécuter |
 | **Win + Shift + P** | ⏸️ **Pause** de GlazeWM (pour jouer ou dépanner). Même raccourci pour reprendre |
 | **Win + Shift + R** | Recharger la config |
 | **Win + Shift + W** | Redessiner les fenêtres |
@@ -253,7 +271,7 @@ Les **5 dernières versions** sont gardées, plus une copie `derniere` que la r�
 → Uniquement quand GlazeWM est en pause ou fermé. Sinon, Win + Espace ouvre le lanceur.
 
 **Je veux modifier un raccourci.**
-→ `%USERPROFILE%\.glzr\glazewm\config.yaml`, section `keybindings`, puis **Win + Shift + R**. ⚠️ GlazeWM ne sait pas lancer un chemin **contenant un espace ou entre guillemets** : utilise un raccourci `.lnk` placé dans `C:\ProgramData\Mamumi-Os\` (exemple : `shell-exec explorer.exe C:\ProgramData\Mamumi-Os\MonAppli.lnk`).
+→ `%USERPROFILE%\.glzr\glazewm\config.yaml`, section `keybindings`, puis **Win + Shift + R**. Pense à mettre à jour aussi la liste du panneau **Win + K** (`C:\ProgramData\Mamumi-Os\keys.txt`). ⚠️ GlazeWM ne sait pas lancer un chemin **contenant un espace ou entre guillemets** : utilise un raccourci `.lnk` placé dans `C:\ProgramData\Mamumi-Os\` (exemple : `shell-exec explorer.exe C:\ProgramData\Mamumi-Os\MonAppli.lnk`).
 
 **Faut-il mettre à jour GlazeWM et Zebar ?**
 → Pas sans vérifier : une version majeure de Zebar (v4…) pourrait demander d'adapter la barre. Ils ne se mettent **pas** à jour tout seuls.
@@ -307,6 +325,7 @@ Mamumi-Os/
 │   ├── glazewm/config.yaml      # raccourcis, couleurs, jeux ignorés, espaces de travail
 │   ├── zebar/settings.json      # quelle barre lancer
 │   ├── zebar/tokyo-night/       # la barre du haut (HTML/React + CSS + permissions)
+│   ├── keys.txt                 # liste du panneau des raccourcis (Win + K)
 │   ├── flow/Tokyo Night.xaml    # thème du lanceur
 │   └── terminal/tokyo-night.json# palette et réglages de Windows Terminal (fusionnés, pas écrasés)
 └── tools/
@@ -314,6 +333,7 @@ Mamumi-Os/
     │                            # + rend la barre Windows si GlazeWM n'est plus là
     ├── flyout.cs                # mini-programme (compilé à l'installation avec le compilateur
     │                            #   intégré à Windows) qui ouvre les panneaux natifs instantanément
+    ├── keys.cs                  # panneau des raccourcis Win + K (compilé à l'installation)
     ├── backup.ps1               # sauvegarde
     └── uninstall.ps1            # désinstallation
 ```

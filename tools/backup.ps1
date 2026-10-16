@@ -15,6 +15,7 @@ foreach ($wt in "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8b
                 "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json") {
     if (Test-Path $wt) { Copy-Item $wt "$dst\terminal\settings.json" -Force; break }
 }
+Copy-Item "$env:ProgramData\Mamumi-Os\keys.txt" "$dst\keys.txt" -Force -ErrorAction SilentlyContinue
 Copy-Item "$env:APPDATA\FlowLauncher\Themes\Tokyo Night.xaml" "$dst\flow\" -Force -ErrorAction SilentlyContinue
 Copy-Item "$env:APPDATA\FlowLauncher\Settings\Settings.json" "$dst\flow\" -Force -ErrorAction SilentlyContinue
 
