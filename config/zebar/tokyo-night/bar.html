@@ -10,14 +10,14 @@
 
     <!-- Preact + htm (~30x plus leger que React, sans compilateur). Bibliotheques embarquees dans vendor/ : aucun telechargement. -->
     <script type="module">
-      import { html, render, useState, useEffect } from './vendor/htm@3.1.1/es2022/preact/standalone.bundle.js';
+      import { html, render, useState, useEffect, useRef } from './vendor/htm@3.1.1/es2022/preact/standalone.bundle.js';
       import * as zebar from './vendor/zebar@3.3.1/es2022/zebar.bundle.js';
 
       const providers = zebar.createProviderGroup({
         network: { type: 'network' },
         glazewm: { type: 'glazewm' },
-        cpu: { type: 'cpu' },
-        memory: { type: 'memory' },
+        cpu: { type: 'cpu', refreshInterval: 2000 },
+        memory: { type: 'memory', refreshInterval: 2000 },
         audio: { type: 'audio' },
         systray: { type: 'systray' },
         date: { type: 'date', formatting: 'EEE d MMM  HH:mm', locale: 'fr-FR' },
@@ -34,14 +34,38 @@
         !node ? [] : node.type === 'window' ? [node] : (node.children ?? []).flatMap(collectWindows);
 
       const speed = m => (m ? `${Math.round(m.siValue)}${m.siUnit}` : '-');
+      const go = bytes => (bytes / 1073741824).toFixed(1);
+      const HISTORY = 30;   // 30 mesures x 2 s = la derniere minute
+
+      // Mini graphique (0-100 %) des dernieres mesures.
+      function Sparkline({ values, cls }) {
+        const w = 60, h = 14;
+        if (values.length < 2) return html`<svg class=${`spark ${cls}`} width=${w} height=${h}></svg>`;
+        const step = w / (HISTORY - 1), x0 = w - (values.length - 1) * step;
+        const pts = values.map((v, i) => `${(x0 + i * step).toFixed(1)},${(h - 1 - (Math.min(v, 100) / 100) * (h - 2)).toFixed(1)}`).join(' ');
+        return html`
+          <svg class=${`spark ${cls}`} width=${w} height=${h} viewBox=${`0 0 ${w} ${h}`}>
+            <polyline points=${`${x0},${h} ${pts} ${w},${h}`} class="area" />
+            <polyline points=${pts} class="line" />
+          </svg>`;
+      }
 
       function App() {
         const [output, setOutput] = useState(providers.outputMap);
         const [powerOpen, setPowerOpen] = useState(false);
+        const [statsOpen, setStatsOpen] = useState(false);
+        const hist = useRef({ cpu: [], mem: [], lastCpu: null, lastMem: null });
 
         useEffect(() => {
-          providers.onOutput(() => setOutput({ ...providers.outputMap }));
+          providers.onOutput(() => {
+            const o = providers.outputMap, h = hist.current;
+            // Historique : une valeur par nouvelle mesure.
+            if (o.cpu && o.cpu !== h.lastCpu) { h.lastCpu = o.cpu; h.cpu = [...h.cpu, o.cpu.usage].slice(-HISTORY); }
+            if (o.memory && o.memory !== h.lastMem) { h.lastMem = o.memory; h.mem = [...h.mem, o.memory.usage].slice(-HISTORY); }
+            setOutput({ ...o });
+          });
         }, []);
+        const openTaskManager = e => { e.preventDefault(); run('taskmgr', []); };
 
         const gwm = output.glazewm;
 
@@ -152,14 +176,26 @@
                 </div>`}
 
               ${output.memory && html`
-                <div class="module memory" title="RAM">
-                  <i class="nf nf-fae-chip"></i>${Math.round(output.memory.usage)}%
-                </div>`}
+                <button class=${`module memory ${statsOpen ? 'open' : ''}`}
+                  title="RAM - clic : details, clic droit : Gestionnaire des taches"
+                  onClick=${() => setStatsOpen(!statsOpen)} onContextMenu=${openTaskManager}>
+                  <i class="nf nf-fae-chip"></i>
+                  ${statsOpen && html`
+                    <span class="detail">${go(output.memory.usedMemory)} / ${go(output.memory.totalMemory)} Go</span>
+                    <${Sparkline} values=${hist.current.mem} cls="mem" />
+                    ${output.memory.usedSwap > 0 && html`<span class="detail dim">swap ${go(output.memory.usedSwap)} Go</span>`}`}
+                  <span class=${output.memory.usage > 85 ? 'high-usage' : ''}>${Math.round(output.memory.usage)}%</span>
+                </button>`}
               ${output.cpu && html`
-                <div class="module cpu" title="Processeur">
+                <button class=${`module cpu ${statsOpen ? 'open' : ''}`}
+                  title="Processeur - clic : details, clic droit : Gestionnaire des taches"
+                  onClick=${() => setStatsOpen(!statsOpen)} onContextMenu=${openTaskManager}>
                   <i class="nf nf-oct-cpu"></i>
+                  ${statsOpen && html`
+                    <span class="detail dim">${output.cpu.physicalCoreCount}c/${output.cpu.logicalCoreCount}t</span>
+                    <${Sparkline} values=${hist.current.cpu} cls="cpu" />`}
                   <span class=${output.cpu.usage > 85 ? 'high-usage' : ''}>${Math.round(output.cpu.usage)}%</span>
-                </div>`}
+                </button>`}
 
               <div class="power">
                 ${powerOpen && html`

@@ -23,7 +23,7 @@
         "vendor/**/*"
       ],
       "caching": {
-        "defaultDuration": 604800,
+        "defaultDuration": 0,
         "rules": []
       },
       "privileges": {
@@ -37,12 +37,16 @@
             "argsRegex": "^(user32\\.dll,LockWorkStation|powrprof\\.dll,SetSuspendState 0,1,0)$"
           },
           {
+            "program": "C:\\ProgramData\\Mamumi-Os\\flyout.exe",
+            "argsRegex": "^(quick|volume|calendar)$"
+          },
+          {
             "program": "shutdown",
             "argsRegex": "^/[rs] /t 0$"
           },
           {
-            "program": "C:\\ProgramData\\Mamumi-Os\\flyout.exe",
-            "argsRegex": "^(quick|volume|calendar)$"
+            "program": "taskmgr",
+            "argsRegex": "^$"
           }
         ]
       },

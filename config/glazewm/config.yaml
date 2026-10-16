@@ -40,7 +40,7 @@ window_effects:
       enabled: true
       color: '#7aa2f7'
     hide_title_bar:
-      enabled: false
+      enabled: true
     corner_style:
       enabled: false
       style: 'square'
@@ -52,7 +52,7 @@ window_effects:
       enabled: true
       color: '#414868'
     hide_title_bar:
-      enabled: false
+      enabled: true
     corner_style:
       enabled: false
       style: 'square'
