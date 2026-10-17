@@ -8,6 +8,8 @@
   --fg: #c0caf5;
   --fg-dim: #565f89;
   --blue: #7aa2f7;
+  --accent: #bb9af7;   /* violet Tokyo Night : couleur principale */
+  --pink: #f4a6e0;     /* rose : touches secondaires */
   --purple: #bb9af7;
   --cyan: #7dcfff;
   --green: #9ece6a;
@@ -73,11 +75,11 @@ p {
 i {
   margin-right: 6px;
   font-size: var(--icon-size);
-  color: var(--blue);
+  color: var(--accent);
 }
 
 .logo {
-  color: var(--purple);
+  color: var(--pink);
   margin-right: 14px;
   font-size: 15px;
 }
@@ -105,7 +107,7 @@ i {
 
   &.focused {
     background: var(--bg-alt);
-    color: var(--blue);
+    color: var(--accent);
     font-weight: 700;
   }
 
@@ -161,7 +163,7 @@ i {
 
   &:hover {
     background: var(--bg-alt);
-    color: var(--blue);
+    color: var(--accent);
   }
 }
 
@@ -216,10 +218,12 @@ button.module {
     opacity: 0.18;
   }
 
-  &.mem .line { stroke: var(--blue); }
-  &.mem .area { fill: var(--blue); }
-  &.cpu .line { stroke: var(--purple); }
-  &.cpu .area { fill: var(--purple); }
+  &.mem .line { stroke: var(--accent); }
+  &.mem .area { fill: var(--accent); }
+  &.cpu .line { stroke: var(--pink); }
+  &.cpu .area { fill: var(--pink); }
+  &.gpu .line { stroke: var(--green); }
+  &.gpu .area { fill: var(--green); }
 }
 
 .network.offline,
@@ -270,7 +274,7 @@ button.module {
 .volume-slider {
   width: 90px;
   margin-left: 6px;
-  accent-color: var(--blue);
+  accent-color: var(--accent);
   cursor: pointer;
 }
 
@@ -315,13 +319,16 @@ button.module {
   }
 }
 
+/* Bouton alimentation : discret (violet), rouge seulement au survol ou une fois ouvert. */
 .power-button i {
   margin: 0;
-  color: var(--red);
+  color: var(--accent);
+  transition: color 0.15s;
 }
 
+.power-button:hover i,
 .power-button.open i {
-  color: var(--fg-dim);
+  color: var(--red);
 }
 
 .pill,

@@ -30,14 +30,14 @@ class KeysForm : Form
 {
     const string Title = "Mamumi-Os - Raccourcis";
     static readonly Color Bg = Color.FromArgb(0x1a, 0x1b, 0x26);
-    static readonly Color BgSel = Color.FromArgb(0x29, 0x2e, 0x42);
+    static readonly Color BgSel = Color.FromArgb(0x2a, 0x24, 0x40);
     static readonly Color BgSearch = Color.FromArgb(0x16, 0x16, 0x1e);
-    static readonly Color Border = Color.FromArgb(0x7a, 0xa2, 0xf7);
+    static readonly Color Border = Color.FromArgb(0xbb, 0x9a, 0xf7);
     static readonly Color Fg = Color.FromArgb(0xc0, 0xca, 0xf5);
     static readonly Color Dim = Color.FromArgb(0x56, 0x5f, 0x89);
-    static readonly Color KeyCol = Color.FromArgb(0x7a, 0xa2, 0xf7);
-    static readonly Color Head = Color.FromArgb(0xbb, 0x9a, 0xf7);
-    static readonly Color Cyan = Color.FromArgb(0x7d, 0xcf, 0xff);
+    static readonly Color KeyCol = Color.FromArgb(0xbb, 0x9a, 0xf7);
+    static readonly Color Head = Color.FromArgb(0xf4, 0xa6, 0xe0);
+    static readonly Color Cyan = Color.FromArgb(0xf4, 0xa6, 0xe0);
 
     readonly List<Item> all;
     List<Item> view = new List<Item>();

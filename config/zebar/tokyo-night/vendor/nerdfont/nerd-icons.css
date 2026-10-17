@@ -32,4 +32,4 @@
 .nf-md-wifi_strength_4:before { content: "\f0928"; }
 .nf-md-wifi_strength_off_outline:before { content: "\f092e"; }
 .nf-md-window_restore:before { content: "\f05b2"; }
-.nf-oct-cpu:before { content: "\f4bc"; }
+.nf-oct-cpu:before { content: "\f4bc"; }.nf-md-expansion_card:before { content: "\f08ae"; }

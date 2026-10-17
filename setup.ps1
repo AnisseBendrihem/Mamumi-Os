@@ -207,15 +207,15 @@ Set-Reg $pers SystemUsesLightTheme 0
 Set-Reg $pers EnableTransparency 1
 Set-Reg $pers ColorPrevalence 1
 $acc = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
-$pal = @('#c0caf5', '#a9c1ff', '#89b4fa', '#7aa2f7', '#24283b', '#1f2335', '#1a1b26', '#565f89')
+$pal = @('#e6d9ff', '#d6c2ff', '#c8adfb', '#bb9af7', '#2a2440', '#221e35', '#1a1b26', '#565f89')
 $bytes = foreach ($c in $pal) { [Convert]::ToByte($c.Substring(1, 2), 16); [Convert]::ToByte($c.Substring(3, 2), 16); [Convert]::ToByte($c.Substring(5, 2), 16); 0 }
 Set-Reg $acc AccentPalette ([byte[]]$bytes) Binary
-Set-Reg $acc AccentColorMenu (Abgr '#1f2335')
-Set-Reg $acc StartColorMenu (Abgr '#1f2335')
+Set-Reg $acc AccentColorMenu (Abgr '#221e35')
+Set-Reg $acc StartColorMenu (Abgr '#221e35')
 $dwm = 'HKCU:\Software\Microsoft\Windows\DWM'
-Set-Reg $dwm AccentColor (Abgr '#7aa2f7')
-Set-Reg $dwm ColorizationColor ([BitConverter]::ToInt32([byte[]](0xF7, 0xA2, 0x7A, 0xC4), 0))
-Set-Reg $dwm ColorizationAfterglow ([BitConverter]::ToInt32([byte[]](0xF7, 0xA2, 0x7A, 0xC4), 0))
+Set-Reg $dwm AccentColor (Abgr '#bb9af7')
+Set-Reg $dwm ColorizationColor ([BitConverter]::ToInt32([byte[]](0xF7, 0x9A, 0xBB, 0xC4), 0))
+Set-Reg $dwm ColorizationAfterglow ([BitConverter]::ToInt32([byte[]](0xF7, 0x9A, 0xBB, 0xC4), 0))
 Set-Reg $dwm ColorPrevalence 0
 Set-Reg 'HKCU:\Control Panel\Desktop' AutoColorization 0
 $sr = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3'

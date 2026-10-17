@@ -34,6 +34,15 @@
         !node ? [] : node.type === 'window' ? [node] : (node.children ?? []).flatMap(collectWindows);
 
       const speed = m => (m ? `${Math.round(m.siValue)}${m.siUnit}` : '-');
+
+      // Zone de notification : la barre prend brievement le premier plan avant de
+      // transmettre le clic, sinon Windows interdit a l'appli d'afficher son menu
+      // (Quitter, Parametres...) ou le referme aussitot.
+      async function trayClick(e, tray, action, id) {
+        e.preventDefault();
+        try { await zebar.currentWidget().tauriWindow.setFocus(); } catch { }
+        tray[action](id);
+      }
       const go = bytes => (bytes / 1073741824).toFixed(1);
       const HISTORY = 30;   // 30 mesures x 2 s = la derniere minute
 
@@ -54,7 +63,25 @@
         const [output, setOutput] = useState(providers.outputMap);
         const [powerOpen, setPowerOpen] = useState(false);
         const [statsOpen, setStatsOpen] = useState(false);
-        const hist = useRef({ cpu: [], mem: [], lastCpu: null, lastMem: null });
+        const [gpu, setGpu] = useState(null);
+        const hist = useRef({ cpu: [], mem: [], gpu: [], lastCpu: null, lastMem: null });
+
+        // Carte graphique NVIDIA : lecture via nvidia-smi toutes les 3 s (absent = module cache).
+        useEffect(() => {
+          let alive = true;
+          const read = async () => {
+            try {
+              const r = await zebar.shellExec('nvidia-smi', ['--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw', '--format=csv,noheader,nounits']);
+              const [usage, used, total, temp, power] = r.stdout.trim().split('\n')[0].split(',').map(x => parseFloat(x));
+              if (!alive || isNaN(usage)) return;
+              hist.current.gpu = [...hist.current.gpu, usage].slice(-HISTORY);
+              setGpu({ usage, used, total, temp, power });
+            } catch { if (alive) setGpu(null); }
+          };
+          read();
+          const t = setInterval(read, 3000);
+          return () => { alive = false; clearInterval(t); };
+        }, []);
 
         useEffect(() => {
           providers.onOutput(() => {
@@ -147,9 +174,9 @@
                 <div class="systray">
                   ${tray.icons.map(icon => html`
                     <img key=${icon.id} src=${icon.iconUrl} title=${icon.tooltip}
-                      onClick=${e => { e.preventDefault(); tray.onLeftClick(icon.id); }}
-                      onContextMenu=${e => { e.preventDefault(); tray.onRightClick(icon.id); }}
-                      onDblClick=${e => { e.preventDefault(); tray.onLeftDoubleClick(icon.id); }} />`)}
+                      onClick=${e => trayClick(e, tray, 'onLeftClick', icon.id)}
+                      onContextMenu=${e => trayClick(e, tray, 'onRightClick', icon.id)}
+                      onDblClick=${e => trayClick(e, tray, 'onLeftDoubleClick', icon.id)} />`)}
                 </div>`}
 
               <button class=${`module network ${online ? '' : 'offline'}`}
@@ -195,6 +222,18 @@
                     <span class="detail dim">${output.cpu.physicalCoreCount}c/${output.cpu.logicalCoreCount}t</span>
                     <${Sparkline} values=${hist.current.cpu} cls="cpu" />`}
                   <span class=${output.cpu.usage > 85 ? 'high-usage' : ''}>${Math.round(output.cpu.usage)}%</span>
+                </button>`}
+              ${gpu && html`
+                <button class=${`module gpu ${statsOpen ? 'open' : ''}`}
+                  title="Carte graphique - clic : details, clic droit : Gestionnaire des taches"
+                  onClick=${() => setStatsOpen(!statsOpen)} onContextMenu=${openTaskManager}>
+                  <i class="nf nf-md-expansion_card"></i>
+                  ${statsOpen && html`
+                    <span class="detail">${(gpu.used / 1024).toFixed(1)} / ${(gpu.total / 1024).toFixed(1)} Go</span>
+                    <span class=${`detail ${gpu.temp >= 80 ? 'high-usage' : 'dim'}`}>${Math.round(gpu.temp)}°C</span>
+                    <span class="detail dim">${Math.round(gpu.power)} W</span>
+                    <${Sparkline} values=${hist.current.gpu} cls="gpu" />`}
+                  <span class=${gpu.usage > 85 ? 'high-usage' : ''}>${Math.round(gpu.usage)}%</span>
                 </button>`}
 
               <div class="power">

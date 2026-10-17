@@ -82,7 +82,7 @@ Le reste est fait avec ce qui est **déjà dans Windows** : de petits programmes
   └────────┘   └────┴────┘   └────┴────┘   └────┴──┴─┘
   ```
   Pour revenir à des colonnes simples, crée un fichier vide `C:\ProgramData\Mamumi-Os\autotiling.off`.
-- **Bordure bleue** sur la fenêtre active, grise sur les autres.
+- **Bordure violette** sur la fenêtre active, grise sur les autres.
 - **Barres de titre masquées**, comme sur Omarchy. Pour déplacer une fenêtre, utilise **Win + Shift + flèches**. Pour la fermer, **Win + W**. Pour réafficher les barres de titre, passe `hide_title_bar` à `false` dans `config.yaml`, puis **Win + Shift + R**.
 - **9 espaces de travail** (bureaux virtuels).
 - Les **jeux et launchers** (Steam, Epic, Riot, Battle.net, EA, Ubisoft, Xbox…) sont **ignorés** : ils fonctionnent normalement.
@@ -99,9 +99,9 @@ Elle remplace la barre des tâches Windows, qui est **cachée**. Détails dans [
 ### 4. Thème Tokyo Night partout
 | Élément | Changement |
 |---|---|
-| Windows | Mode sombre, couleur d'accent bleu Tokyo Night `#7aa2f7` |
-| Menu Démarrer | Fond bleu nuit `#1f2335`, **centré**, **épuré** : plus de section « Recommandé », de fichiers récents ou de suggestions, et plus de place pour les épingles |
-| Panneaux Windows (Wi-Fi, volume, calendrier) | Bleu nuit |
+| Windows | Mode sombre, couleur d'accent **violet** Tokyo Night `#bb9af7`, avec des touches de **rose** `#f4a6e0` |
+| Menu Démarrer | Fond bleu nuit légèrement violet `#221e35`, **centré**, **épuré** : plus de section « Recommandé », de fichiers récents ou de suggestions, et plus de place pour les épingles |
+| Panneaux Windows (Wi-Fi, volume, calendrier) | Bleu nuit légèrement violet |
 | Windows Terminal | Palette Tokyo Night, police Cascadia Mono, légère transparence, marges, sans barre de défilement. **Tes profils sont conservés** |
 | Bureau | Icônes masquées, pour un bureau propre comme sur Omarchy |
 
@@ -209,15 +209,15 @@ La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]`
 
 | Élément | Affichage | Clic gauche | Autre |
 |---|---|---|---|
-| **Espaces 1 2 3…** | Espace actif en bleu | Aller à cet espace | |
+| **Espaces 1 2 3…** | Espace actif en violet | Aller à cet espace | |
 | **Fenêtres réduites** | Nom de l'appli | La fait revenir | |
 | **Heure** | Date et heure | Ouvre le **calendrier** Windows. Un 2e clic le ferme | |
-| **Zone de notification** | Icônes discrètes (grises), en couleur au survol | Ouvre l'appli | **Clic droit** : menu de l'appli |
+| **Zone de notification** | Icônes discrètes (grises), en couleur au survol | Ouvre l'appli | **Clic droit** : le vrai menu de l'appli (Quitter, Paramètres…) |
 | **Internet** | Câble ou Wi-Fi + débit ↓↑, **rouge « Hors ligne »** sans connexion | **Paramètres rapides** (Wi-Fi, Bluetooth…) | |
 | **Bluetooth** | ᛒ | **Paramètres rapides** | |
 | **Volume** | Niveau en % | **Panneau volume** Windows | **Clic droit** : couper le son. **Molette** : ±5 % |
-| **RAM / CPU** | Utilisation en %, en rouge au-delà de 85 % | **Détail** sur place : Go utilisés / total, cœurs et threads, **mini-graphique** de la dernière minute. Un 2e clic le referme | **Clic droit** : Gestionnaire des tâches |
-| **⏻ Alimentation** | | Menu : 🔒 verrouiller, 💤 veille, 🔄 redémarrer, ⏻ éteindre | ⚠️ Redémarrer et éteindre sont **immédiats** |
+| **RAM / CPU / GPU** | Utilisation en %, en rouge au-delà de 85 % | **Détail** sur place : Go utilisés / total, cœurs et threads, mémoire vidéo, température et watts de la carte graphique, **mini-graphiques** de la dernière minute. Un 2e clic le referme | **Clic droit** : Gestionnaire des tâches. Le GPU s'affiche avec une carte **NVIDIA** (via `nvidia-smi`), sinon il est masqué |
+| **⏻ Alimentation** | Violet, rouge au survol | Menu : 🔒 verrouiller, 💤 veille, 🔄 redémarrer, ⏻ éteindre | ⚠️ Redémarrer et éteindre sont **immédiats** |
 
 **Sécurité :** la barre ne peut lancer **que** ces quelques commandes précises (liste blanche dans `zpack.json`).
 
@@ -237,7 +237,7 @@ La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]`
 ## 🧰 Entretien : réparer, sauvegarder, désinstaller
 
 ### Réparer
-Après une **grosse mise à jour Windows**, il arrive que des réglages sautent : couleurs revenues en bleu clair, barre Windows réapparue, pubs de retour, appli réinstallée…
+Après une **grosse mise à jour Windows**, il arrive que des réglages sautent : couleurs revenues au bleu par défaut, barre Windows réapparue, pubs de retour, appli réinstallée…
 
 👉 Touche **Win**, tape **« Réparer Mamumi-Os »**, **Entrée**, puis accepte la fenêtre admin.
 

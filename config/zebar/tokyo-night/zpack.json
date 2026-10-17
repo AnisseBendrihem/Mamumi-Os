@@ -47,6 +47,10 @@
           {
             "program": "taskmgr",
             "argsRegex": "^$"
+          },
+          {
+            "program": "nvidia-smi",
+            "argsRegex": "^--query-gpu=utilization\\.gpu,memory\\.used,memory\\.total,temperature\\.gpu,power\\.draw --format=csv,noheader,nounits$"
           }
         ]
       },
