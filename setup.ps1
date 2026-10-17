@@ -109,12 +109,20 @@ if (-not $Repair) {
 # ------------------------------------------------------------
 Step "4. Outils Mamumi-Os (barre cachee, spirale, panneaux Windows, raccourcis)"
 $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-# Garde : cache la barre Windows, relance la barre si elle plante, spirale facon Hyprland.
-Get-Process taskbar-guard -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+$refs = '/r:System.Web.Extensions.dll', '/r:System.Windows.Forms.dll', '/r:System.Drawing.dll'
+# Themes (Win + Shift + T) : liste des themes + theme actif (garde si deja choisi).
+Copy-Item "$repoCopy\config\themes.json" "$Tools\themes.json" -Force
+# Garde : cache la barre Windows, relance la barre si elle plante, spirale facon Hyprland,
+# et change de theme instantanement (compilee avec le changeur de theme).
+Get-Process taskbar-guard, mamumi-theme -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 if (-not (Test-Path "$Tools\taskbar-guard.exe") -or -not $Repair) {
-    & $csc /nologo /target:winexe /optimize+ /out:"$Tools\taskbar-guard.exe" "$repoCopy\tools\taskbar-guard.cs" | Out-Null
+    & $csc /nologo /target:winexe /optimize+ /codepage:65001 /main:TaskbarGuard @refs /out:"$Tools\taskbar-guard.exe" "$repoCopy\tools\taskbar-guard.cs" "$repoCopy\tools\theme.cs" | Out-Null
 }
-if (Test-Path "$Tools\taskbar-guard.exe") { Ok 'taskbar-guard.exe compile (barre cachee + spirale)' } else { Warn 'Compilation de taskbar-guard.exe echouee' }
+if (Test-Path "$Tools\taskbar-guard.exe") { Ok 'taskbar-guard.exe compile (barre cachee + spirale + themes)' } else { Warn 'Compilation de taskbar-guard.exe echouee' }
+if (-not (Test-Path "$Tools\mamumi-theme.exe") -or -not $Repair) {
+    & $csc /nologo /target:winexe /optimize+ /codepage:65001 @refs /out:"$Tools\mamumi-theme.exe" "$repoCopy\tools\theme.cs" | Out-Null
+}
+if (Test-Path "$Tools\mamumi-theme.exe") { Ok 'mamumi-theme.exe compile (13 themes facon Omarchy)' } else { Warn 'Compilation de mamumi-theme.exe echouee' }
 if (-not (Test-Path "$Tools\flyout.exe") -or -not $Repair) {
     & $csc /nologo /target:winexe /optimize+ /out:"$Tools\flyout.exe" "$repoCopy\tools\flyout.cs" | Out-Null
 }
@@ -300,7 +308,15 @@ New-Shortcut "$sm\Desinstaller Mamumi-Os.lnk" $ps "-NoProfile -ExecutionPolicy B
 Ok "Sauvegarde dans $(Get-BackupDir)"
 
 # ------------------------------------------------------------
-Step "15. Demarrage de GlazeWM et de la barre"
+Step "15. Theme (Tokyo Night violet par defaut, Win + Shift + T pour changer)"
+# Installation : premier theme de la liste. Reparation : le theme actif est conserve.
+if (Test-Path "$Tools\mamumi-theme.exe") {
+    Start-Process "$Tools\mamumi-theme.exe" -ArgumentList 'apply' -Wait
+    Ok "Theme applique : $(Get-Content "$Tools\theme-current.txt" -ErrorAction SilentlyContinue)"
+}
+
+# ------------------------------------------------------------
+Step "16. Demarrage de GlazeWM et de la barre"
 Get-Process taskbar-guard, glazewm, zebar -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
 Start-Sleep 3
@@ -317,6 +333,7 @@ Write-Host @"
   Termine ! Redemarre le PC pour tout finaliser.
 
   Win + K          TOUS les raccourcis (navigable, Entree = executer)
+  Win + Shift + T  theme suivant (13 themes facon Omarchy)
   Win + Entree     terminal         Win + Espace   menu Demarrer
   Win + B          navigateur       Win + W        fermer
   Win + fleches    changer de fenetre

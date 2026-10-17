@@ -29,15 +29,15 @@ class Item
 class KeysForm : Form
 {
     const string Title = "Mamumi-Os - Raccourcis";
-    static readonly Color Bg = Color.FromArgb(0x1a, 0x1b, 0x26);
-    static readonly Color BgSel = Color.FromArgb(0x2a, 0x24, 0x40);
-    static readonly Color BgSearch = Color.FromArgb(0x16, 0x16, 0x1e);
-    static readonly Color Border = Color.FromArgb(0xbb, 0x9a, 0xf7);
-    static readonly Color Fg = Color.FromArgb(0xc0, 0xca, 0xf5);
-    static readonly Color Dim = Color.FromArgb(0x56, 0x5f, 0x89);
-    static readonly Color KeyCol = Color.FromArgb(0xbb, 0x9a, 0xf7);
-    static readonly Color Head = Color.FromArgb(0xf4, 0xa6, 0xe0);
-    static readonly Color Cyan = Color.FromArgb(0xf4, 0xa6, 0xe0);
+    static Color Bg = Color.FromArgb(0x1a, 0x1b, 0x26);
+    static Color BgSel = Color.FromArgb(0x2a, 0x24, 0x40);
+    static Color BgSearch = Color.FromArgb(0x16, 0x16, 0x1e);
+    static Color Border = Color.FromArgb(0xbb, 0x9a, 0xf7);
+    static Color Fg = Color.FromArgb(0xc0, 0xca, 0xf5);
+    static Color Dim = Color.FromArgb(0x56, 0x5f, 0x89);
+    static Color KeyCol = Color.FromArgb(0xbb, 0x9a, 0xf7);
+    static Color Head = Color.FromArgb(0xf4, 0xa6, 0xe0);
+    static Color Cyan = Color.FromArgb(0xf4, 0xa6, 0xe0);
 
     readonly List<Item> all;
     List<Item> view = new List<Item>();
@@ -296,6 +296,26 @@ class KeysForm : Form
             g.DrawString("↑↓ naviguer   Entrée exécuter   Échap fermer   (gris = aide seulement)", fHint, b, pad, ClientSize.Height - pad - fHint.GetHeight(g));
     }
 
+    // Couleurs du theme actif (ecrit par mamumi-theme.exe).
+    static void LoadTheme(string path)
+    {
+        if (!File.Exists(path)) return;
+        var d = new Dictionary<string, Color>();
+        foreach (var line in File.ReadAllLines(path))
+        {
+            int eq = line.IndexOf('=');
+            if (eq > 0) try { d[line.Substring(0, eq).Trim()] = ColorTranslator.FromHtml(line.Substring(eq + 1).Trim()); } catch { }
+        }
+        Color c;
+        if (d.TryGetValue("bg", out c)) Bg = c;
+        if (d.TryGetValue("bgAlt", out c)) BgSel = c;
+        if (d.TryGetValue("menu", out c)) BgSearch = c;
+        if (d.TryGetValue("fg", out c)) Fg = c;
+        if (d.TryGetValue("dim", out c)) Dim = c;
+        if (d.TryGetValue("accent", out c)) { Border = c; KeyCol = c; }
+        if (d.TryGetValue("accent2", out c)) { Head = c; Cyan = c; }
+    }
+
     static bool FontExists(string name)
     {
         using (var fonts = new InstalledFontCollection())
@@ -317,6 +337,7 @@ class KeysForm : Form
             }
             SetProcessDPIAware();
             Application.EnableVisualStyles();
+            LoadTheme(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "theme.ini"));
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "keys.txt");
             var items = new List<Item>();

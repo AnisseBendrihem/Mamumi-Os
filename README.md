@@ -1,12 +1,12 @@
 # 🌙 Mamumi-Os
 
-**Transforme Windows 10/11 en un bureau façon [Omarchy](https://omarchy.org) : fenêtres en mosaïque, tout au clavier, thème Tokyo Night, et un Windows débarrassé des pubs et du superflu.**
+**Transforme Windows 10/11 en un bureau façon [Omarchy](https://omarchy.org) : fenêtres en mosaïque, tout au clavier, 13 thèmes (Tokyo Night violet par défaut, Win + Shift + T pour changer), et un Windows débarrassé des pubs et du superflu.**
 
 Une seule commande, environ 2 minutes, et c'est installé.
 
 ```
   ┌──────────────────────────────────────────────────────────────────────────┐
-  │ 🌙 1 2 3 │ ⧉ discord        ven. 16 oct.  22:15         ▫▫▫ 🖧 ↓2MB  ᛒ 🔊45% ⏻ │  ← barre Tokyo Night
+  │ ✦ 1 2 3 │ ⧉ discord        ven. 16 oct.  22:15         ▫▫▫ 🖧 ↓2MB  ᛒ 🔊45% ⏻ │  ← barre Tokyo Night
   ├──────────────────────────────┬───────────────────────────────────────────┤
   │                              │                                           │
   │        Navigateur            │            Terminal                       │  ← fenêtres rangées
@@ -145,7 +145,14 @@ Touches | Ce que ça fait | commande lancée avec Entrée (optionnelle)
 ```
 La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]` ou `send:<touches>`. Une ligne sans commande s'affiche en gris, comme simple aide.
 
-### 11. Outils d'entretien (menu Démarrer)
+### 11. 13 thèmes façon Omarchy (Win + Shift + T)
+**Win + Shift + T** passe au thème suivant, **Win + Ctrl + Shift + T** revient au précédent. Une petite notification affiche le nom du thème. Le changement prend environ 0,1 s.
+
+Thèmes : **Tokyo Night violet** (par défaut), Tokyo Night, Catppuccin, Catppuccin Latte (clair), Gruvbox, Everforest, Kanagawa, Nord, Rose Pine, Matte Black, Osaka Jade, Ristretto, Flexoki (clair).
+
+Un thème change **tout d'un coup** : la barre du haut, les bordures des fenêtres, la couleur d'accent et le mode clair/sombre de Windows (menu Démarrer, panneaux), la palette de Windows Terminal et le panneau Win + K. Les thèmes se trouvent dans `C:\ProgramData\Mamumi-Os\themes.json` : tu peux en ajouter ou les modifier.
+
+### 12. Outils d'entretien (menu Démarrer)
 - **Réparer Mamumi-Os** : remet tout en place après une mise à jour Windows.
 - **Sauvegarder Mamumi-Os** : sauvegarde ta config.
 - **Désinstaller Mamumi-Os** : revient en arrière.
@@ -188,6 +195,8 @@ La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]`
 | Raccourci | Action |
 |---|---|
 | **Win + K** | 📋 **Panneau de tous les raccourcis** : filtre, navigation, Entrée pour exécuter |
+| **Win + Shift + T** | 🎨 **Thème suivant** (13 thèmes) |
+| **Win + Ctrl + Shift + T** | 🎨 Thème précédent |
 | **Win + Shift + P** | ⏸️ **Pause** de GlazeWM (pour jouer ou dépanner). Même raccourci pour reprendre |
 | **Win + Shift + R** | Recharger la config |
 | **Win + Shift + W** | Redessiner les fenêtres |
@@ -203,12 +212,13 @@ La commande peut être `glaze:<commande GlazeWM>`, `run:<programme> [arguments]`
 ## 📊 La barre du haut
 
 ```
- 🌙 1 2 3 │ ⧉ discord          ven. 16 oct.  22:15          ▫▫▫ │ 🖧 ↓2MB ↑0kB  ᛒ  🔊 45%  ▣ 40%  ⚙ 8%  ⏻
+ ✦ 1 2 3 │ ⧉ discord          ven. 16 oct.  22:15          ▫▫▫ │ 🖧 ↓2MB ↑0kB  ᛒ  🔊 45%  ▣ 40%  ⚙ 8%  ⏻
  └espaces┘ └réduites┘      └──── heure ────┘            └tray┘ └─ internet ─┘ └BT┘ └son─┘ └RAM┘ └CPU┘ └alim┘
 ```
 
 | Élément | Affichage | Clic gauche | Autre |
 |---|---|---|---|
+| **✦ Étoile** | Logo aux couleurs du thème | Menu Démarrer | **Clic droit** : panneau des raccourcis (Win + K) |
 | **Espaces 1 2 3…** | Espace actif en violet | Aller à cet espace | |
 | **Fenêtres réduites** | Nom de l'appli | La fait revenir | |
 | **Heure** | Date et heure | Ouvre le **calendrier** Windows. Un 2e clic le ferme | |
@@ -343,6 +353,7 @@ Mamumi-Os/
 │   ├── zebar/tokyo-night/       # la barre du haut (Preact + htm, CSS, permissions)
 │   │   └── vendor/              #   bibliothèques et police d'icônes embarquées (zéro Internet)
 │   ├── keys.txt                 # liste du panneau des raccourcis (Win + K)
+│   ├── themes.json              # les 13 thèmes (couleurs barre, Windows, terminal, bordures)
 │   └── terminal/tokyo-night.json# palette et réglages de Windows Terminal (fusionnés, pas écrasés)
 └── tools/
     ├── taskbar-guard.cs         # programme compilé : cache la barre Windows, relance la barre du haut
@@ -351,6 +362,8 @@ Mamumi-Os/
     ├── flyout.cs                # mini-programme (compilé à l'installation avec le compilateur
     │                            #   intégré à Windows) qui ouvre les panneaux natifs instantanément
     ├── keys.cs                  # panneau des raccourcis Win + K (compilé à l'installation)
+    ├── theme.cs                 # changement de thème (Win + Shift + T), compilé dans la garde
+    │                            #   et en mamumi-theme.exe (apply / next / prev / set "nom")
     ├── backup.ps1               # sauvegarde
     └── uninstall.ps1            # désinstallation
 ```

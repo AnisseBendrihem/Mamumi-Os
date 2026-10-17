@@ -1,0 +1,82 @@
+{
+  "themes": [
+    {
+      "name": "Tokyo Night violet", "light": false,
+      "bg": "#1a1b26", "bgAlt": "#24283b", "fg": "#c0caf5", "dim": "#565f89",
+      "accent": "#bb9af7", "accent2": "#f4a6e0", "border": "#414868", "red": "#f7768e", "green": "#9ece6a", "menu": "#221e35",
+      "term": ["#15161e","#f7768e","#9ece6a","#e0af68","#7aa2f7","#bb9af7","#7dcfff","#a9b1d6","#414868","#f7768e","#9ece6a","#e0af68","#7aa2f7","#bb9af7","#7dcfff","#c0caf5"]
+    },
+    {
+      "name": "Tokyo Night", "light": false,
+      "bg": "#1a1b26", "bgAlt": "#24283b", "fg": "#c0caf5", "dim": "#565f89",
+      "accent": "#7aa2f7", "accent2": "#bb9af7", "border": "#414868", "red": "#f7768e", "green": "#9ece6a", "menu": "#1f2335",
+      "term": ["#15161e","#f7768e","#9ece6a","#e0af68","#7aa2f7","#bb9af7","#7dcfff","#a9b1d6","#414868","#f7768e","#9ece6a","#e0af68","#7aa2f7","#bb9af7","#7dcfff","#c0caf5"]
+    },
+    {
+      "name": "Catppuccin", "light": false,
+      "bg": "#1e1e2e", "bgAlt": "#313244", "fg": "#cdd6f4", "dim": "#6c7086",
+      "accent": "#cba6f7", "accent2": "#f5c2e7", "border": "#45475a", "red": "#f38ba8", "green": "#a6e3a1", "menu": "#181825",
+      "term": ["#45475a","#f38ba8","#a6e3a1","#f9e2af","#89b4fa","#f5c2e7","#94e2d5","#bac2de","#585b70","#f38ba8","#a6e3a1","#f9e2af","#89b4fa","#f5c2e7","#94e2d5","#a6adc8"]
+    },
+    {
+      "name": "Catppuccin Latte", "light": true,
+      "bg": "#eff1f5", "bgAlt": "#e6e9ef", "fg": "#4c4f69", "dim": "#8c8fa1",
+      "accent": "#8839ef", "accent2": "#ea76cb", "border": "#bcc0cc", "red": "#d20f39", "green": "#40a02b", "menu": "#dce0e8",
+      "term": ["#5c5f77","#d20f39","#40a02b","#df8e1d","#1e66f5","#ea76cb","#179299","#acb0be","#6c6f85","#d20f39","#40a02b","#df8e1d","#1e66f5","#ea76cb","#179299","#bcc0cc"]
+    },
+    {
+      "name": "Gruvbox", "light": false,
+      "bg": "#282828", "bgAlt": "#3c3836", "fg": "#ebdbb2", "dim": "#928374",
+      "accent": "#fabd2f", "accent2": "#fe8019", "border": "#504945", "red": "#fb4934", "green": "#b8bb26", "menu": "#1d2021",
+      "term": ["#282828","#cc241d","#98971a","#d79921","#458588","#b16286","#689d6a","#a89984","#928374","#fb4934","#b8bb26","#fabd2f","#83a598","#d3869b","#8ec07c","#ebdbb2"]
+    },
+    {
+      "name": "Everforest", "light": false,
+      "bg": "#2d353b", "bgAlt": "#343f44", "fg": "#d3c6aa", "dim": "#859289",
+      "accent": "#a7c080", "accent2": "#dbbc7f", "border": "#475258", "red": "#e67e80", "green": "#a7c080", "menu": "#232a2e",
+      "term": ["#475258","#e67e80","#a7c080","#dbbc7f","#7fbbb3","#d699b6","#83c092","#d3c6aa","#859289","#e67e80","#a7c080","#dbbc7f","#7fbbb3","#d699b6","#83c092","#d3c6aa"]
+    },
+    {
+      "name": "Kanagawa", "light": false,
+      "bg": "#1f1f28", "bgAlt": "#2a2a37", "fg": "#dcd7ba", "dim": "#727169",
+      "accent": "#7e9cd8", "accent2": "#957fb8", "border": "#363646", "red": "#e82424", "green": "#98bb6c", "menu": "#16161d",
+      "term": ["#090618","#c34043","#76946a","#c0a36e","#7e9cd8","#957fb8","#6a9589","#c8c093","#727169","#e82424","#98bb6c","#e6c384","#7fb4ca","#938aa9","#7aa89f","#dcd7ba"]
+    },
+    {
+      "name": "Nord", "light": false,
+      "bg": "#2e3440", "bgAlt": "#3b4252", "fg": "#eceff4", "dim": "#4c566a",
+      "accent": "#88c0d0", "accent2": "#81a1c1", "border": "#434c5e", "red": "#bf616a", "green": "#a3be8c", "menu": "#272c36",
+      "term": ["#3b4252","#bf616a","#a3be8c","#ebcb8b","#81a1c1","#b48ead","#88c0d0","#e5e9f0","#4c566a","#bf616a","#a3be8c","#ebcb8b","#81a1c1","#b48ead","#8fbcbb","#eceff4"]
+    },
+    {
+      "name": "Rose Pine", "light": false,
+      "bg": "#191724", "bgAlt": "#26233a", "fg": "#e0def4", "dim": "#6e6a86",
+      "accent": "#c4a7e7", "accent2": "#ebbcba", "border": "#403d52", "red": "#eb6f92", "green": "#9ccfd8", "menu": "#1f1d2e",
+      "term": ["#26233a","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4","#6e6a86","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4"]
+    },
+    {
+      "name": "Matte Black", "light": false,
+      "bg": "#121212", "bgAlt": "#1e1e1e", "fg": "#bebebe", "dim": "#6b6b6b",
+      "accent": "#e68e0d", "accent2": "#d35f5f", "border": "#333333", "red": "#d35f5f", "green": "#8fb573", "menu": "#0d0d0d",
+      "term": ["#1e1e1e","#d35f5f","#8fb573","#e68e0d","#7d8fa4","#a17cb5","#7aa4a1","#bebebe","#6b6b6b","#e06c6c","#a0c487","#f0a33a","#93a5ba","#b393c6","#8fbab6","#eaeaea"]
+    },
+    {
+      "name": "Osaka Jade", "light": false,
+      "bg": "#111c18", "bgAlt": "#1b2a24", "fg": "#c1c497", "dim": "#53685b",
+      "accent": "#2dd5b7", "accent2": "#e5c736", "border": "#23372b", "red": "#ff5345", "green": "#549e6a", "menu": "#0e1714",
+      "term": ["#23372b","#ff5345","#549e6a","#459451","#509475","#d2689c","#2dd5b7","#f6f5dd","#53685b","#db9f9c","#63b07a","#e5c736","#acd4cf","#75bbb3","#8cd3cb","#9eebb3"]
+    },
+    {
+      "name": "Ristretto", "light": false,
+      "bg": "#2c2525", "bgAlt": "#403838", "fg": "#fff1f3", "dim": "#72696a",
+      "accent": "#f9cc6c", "accent2": "#fd6883", "border": "#5b5353", "red": "#fd6883", "green": "#adda78", "menu": "#211c1c",
+      "term": ["#2c2525","#fd6883","#adda78","#f9cc6c","#f38d70","#a8a9eb","#85dacc","#fff1f3","#72696a","#fd6883","#adda78","#f9cc6c","#f38d70","#a8a9eb","#85dacc","#fff1f3"]
+    },
+    {
+      "name": "Flexoki", "light": true,
+      "bg": "#fffcf0", "bgAlt": "#f2f0e5", "fg": "#100f0f", "dim": "#6f6e69",
+      "accent": "#205ea6", "accent2": "#24837b", "border": "#cecdc3", "red": "#af3029", "green": "#66800b", "menu": "#e6e4d9",
+      "term": ["#100f0f","#af3029","#66800b","#ad8301","#205ea6","#a02f6f","#24837b","#878580","#575653","#d14d41","#879a39","#d0a215","#4385be","#ce5d97","#3aa99f","#cecdc3"]
+    }
+  ]
+}

@@ -38,7 +38,7 @@
           },
           {
             "program": "C:\\ProgramData\\Mamumi-Os\\flyout.exe",
-            "argsRegex": "^(quick|volume|calendar)$"
+            "argsRegex": "^(quick|volume|calendar|start)$"
           },
           {
             "program": "shutdown",
@@ -51,6 +51,10 @@
           {
             "program": "nvidia-smi",
             "argsRegex": "^--query-gpu=utilization\\.gpu,memory\\.used,memory\\.total,temperature\\.gpu,power\\.draw --format=csv,noheader,nounits$"
+          },
+          {
+            "program": "C:\\ProgramData\\Mamumi-Os\\mamumi-keys.exe",
+            "argsRegex": "^$"
           }
         ]
       },

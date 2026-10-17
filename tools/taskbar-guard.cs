@@ -39,6 +39,8 @@ static class TaskbarGuard
         "\"focusedContainer\":\\{\"type\":\"window\",\"id\":\"([^\"]+)\".*?\"width\":(\\d+),\"height\":(\\d+).*?\"state\":\\{\"type\":\"(\\w+)\"",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
+    static readonly object ThemeLock = new object();
+
     static void AutoTiling(string offFlag)
     {
         while (true)
@@ -48,7 +50,7 @@ static class TaskbarGuard
                 using (var ws = new ClientWebSocket())
                 {
                     ws.ConnectAsync(new Uri("ws://localhost:6123"), CancellationToken.None).Wait();
-                    Send(ws, "sub -e focus_changed focused_container_moved");
+                    Send(ws, "sub -e focus_changed focused_container_moved binding_modes_changed");
                     string lastKey = null;
                     var buf = new byte[65536];
                     while (ws.State == WebSocketState.Open)
@@ -62,9 +64,26 @@ static class TaskbarGuard
                             sb.Append(Encoding.UTF8.GetString(buf, 0, r.Count));
                         } while (!r.EndOfMessage);
                         if (r.MessageType == WebSocketMessageType.Close) break;
+                        string msg = sb.ToString();
+
+                        // Themes (Win + Shift + T) : GlazeWM active un mode "theme-next"/"theme-prev",
+                        // on le referme et on applique le theme ici, sans lancer de programme.
+                        if (msg.Contains("binding_modes_changed"))
+                        {
+                            string dirTheme = msg.Contains("\"theme-next\"") ? "next" : msg.Contains("\"theme-prev\"") ? "prev" : null;
+                            if (dirTheme != null)
+                            {
+                                Send(ws, "command wm-disable-binding-mode --name theme-" + dirTheme);
+                                var th = new Thread(() => { lock (ThemeLock) { try { ThemeTool.Run(new[] { dirTheme }); } catch { } } });
+                                th.SetApartmentState(ApartmentState.STA);
+                                th.IsBackground = true;
+                                th.Start();
+                            }
+                            continue;
+                        }
                         if (File.Exists(offFlag)) continue;
 
-                        var m = Focused.Match(sb.ToString());
+                        var m = Focused.Match(msg);
                         if (!m.Success || m.Groups[4].Value != "tiling") continue;
                         int w = int.Parse(m.Groups[2].Value), h = int.Parse(m.Groups[3].Value);
                         string dir = w >= h ? "horizontal" : "vertical";

@@ -79,9 +79,21 @@ i {
 }
 
 .logo {
-  color: var(--pink);
-  margin-right: 14px;
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 3px 6px;
+  margin-right: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, filter 0.15s, transform 0.15s;
+
+  &:hover {
+    background: var(--bg-alt);
+    filter: drop-shadow(0 0 4px rgba(187 154 247 / 70%));
+    transform: scale(1.08);
+  }
 }
 
 /* Espaces de travail */

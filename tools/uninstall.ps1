@@ -10,7 +10,7 @@ if ($a -notmatch '^[oOyY]') { return }
 $Tools = Join-Path $env:ProgramData 'Mamumi-Os'
 
 # 1. Arret de GlazeWM, de la barre et du masquage de la barre Windows
-Get-Process taskbar-guard, glazewm, zebar, mamumi-keys -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process taskbar-guard, glazewm, zebar, mamumi-keys, mamumi-theme -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Remove-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name GlazeWM -ErrorAction SilentlyContinue
 
 # 2. Barre Windows normale, icones du bureau, menu Demarrer a gauche

@@ -86,6 +86,8 @@
         useEffect(() => {
           providers.onOutput(() => {
             const o = providers.outputMap, h = hist.current;
+            // Signal de changement de theme (Win + Shift + T) : on recharge les couleurs tout de suite.
+            if (o.glazewm?.bindingModes?.some(m => m.name.startsWith('theme-'))) window.themeBurst?.();
             // Historique : une valeur par nouvelle mesure.
             if (o.cpu && o.cpu !== h.lastCpu) { h.lastCpu = o.cpu; h.cpu = [...h.cpu, o.cpu.usage].slice(-HISTORY); }
             if (o.memory && o.memory !== h.lastMem) { h.lastMem = o.memory; h.mem = [...h.mem, o.memory.usage].slice(-HISTORY); }
@@ -135,7 +137,19 @@
           <div class="app">
             <!-- Gauche : espaces de travail + fenetres reduites -->
             <div class="left">
-              <i class="logo nf nf-md-moon_waning_crescent"></i>
+              <button class="logo" title="Clic : menu Demarrer - Clic droit : tous les raccourcis (Win + K)"
+                onClick=${() => openFlyout('start')}
+                onContextMenu=${e => { e.preventDefault(); run('C:\\ProgramData\\Mamumi-Os\\mamumi-keys.exe', []); }}>
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" style="stop-color: var(--accent)" />
+                      <stop offset="100%" style="stop-color: var(--pink)" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M12 1.5C12.9 8 16 11.1 22.5 12C16 12.9 12.9 16 12 22.5C11.1 16 8 12.9 1.5 12C8 11.1 11.1 8 12 1.5Z" fill="url(#logo-grad)" />
+                </svg>
+              </button>
               ${gwm && html`
                 <div class="workspaces">
                   ${gwm.currentWorkspaces.map(ws => html`
@@ -164,7 +178,7 @@
             <div class="right">
               ${gwm?.isPaused && html`
                 <button class="pill paused-button" onClick=${() => gwm.runCommand('wm-toggle-pause')}>PAUSE</button>`}
-              ${gwm?.bindingModes.map(m => html`
+              ${gwm?.bindingModes.filter(m => !m.name.startsWith('theme-')).map(m => html`
                 <button key=${m.name} class="pill binding-mode"
                   onClick=${() => gwm.runCommand(`wm-disable-binding-mode --name ${m.name}`)}>
                   ${m.displayName ?? m.name}
@@ -262,6 +276,21 @@
       }
 
       render(html`<${App} />`, document.getElementById('root'));
+
+      // Theme (Win + Shift + T) : theme.css est relu 4 fois par seconde et applique a chaud.
+      const themeStyle = document.createElement('style');
+      document.head.appendChild(themeStyle);
+      let lastTheme = '';
+      async function loadTheme() {
+        try {
+          const css = await (await fetch(`./theme.css?t=${Date.now()}`, { cache: 'no-store' })).text();
+          if (css !== lastTheme) { lastTheme = css; themeStyle.textContent = css; }
+        } catch { }
+      }
+      loadTheme();
+      setInterval(loadTheme, 250);
+      // Rafale de relectures juste apres le signal (le fichier est ecrit en quelques ms).
+      window.themeBurst = () => [25, 60, 120, 200].forEach(ms => setTimeout(loadTheme, ms));
     </script>
   </body>
 </html>

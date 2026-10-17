@@ -16,6 +16,7 @@ foreach ($wt in "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8b
     if (Test-Path $wt) { Copy-Item $wt "$dst\terminal\settings.json" -Force; break }
 }
 Copy-Item "$env:ProgramData\Mamumi-Os\keys.txt" "$dst\keys.txt" -Force -ErrorAction SilentlyContinue
+Copy-Item "$env:ProgramData\Mamumi-Os\theme-current.txt" "$dst\theme-current.txt" -Force -ErrorAction SilentlyContinue
 
 $latest = Join-Path $root 'derniere'
 if (Test-Path $latest) { Remove-Item $latest -Recurse -Force }
